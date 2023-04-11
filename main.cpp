@@ -36,14 +36,20 @@ void updateGridImage(cv::Mat& img, int cell_size, std::vector<std::vector<int>>&
 }
 
 void onMouse(int event, int x, int y, int flags, void* userdata) {
+    MouseData* data = (MouseData*)userdata;
+    int cell_size = data->cell_size;
+    std::vector<std::vector<int>>* matrix = data->matrix;
+    int j = x / cell_size;
+    int i = y / cell_size;
     if(event == cv::EVENT_MOUSEMOVE && (flags & cv::EVENT_FLAG_LBUTTON)){
-        MouseData* data = (MouseData*)userdata;
-        int cell_size = data->cell_size;
-        std::vector<std::vector<int>>* matrix = data->matrix;
-        int j = x / cell_size;
-        int i = y / cell_size;
         if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
             matrix->at(i).at(j) = 1;
+            updateGridImage(*data->img, cell_size, *matrix);
+        }
+    } 
+    else if(event == cv::EVENT_MOUSEMOVE && (flags & cv::EVENT_FLAG_RBUTTON)){
+         if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
+            matrix->at(i).at(j) = 0;
             updateGridImage(*data->img, cell_size, *matrix);
         }
     }
