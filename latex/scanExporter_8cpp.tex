@@ -1,0 +1,128 @@
+\hypertarget{scanExporter_8cpp}{}\doxysection{scan\+Exporter.\+cpp File Reference}
+\label{scanExporter_8cpp}\index{scanExporter.cpp@{scanExporter.cpp}}
+
+
+renders lidar scans with raylib and applies rotation from magnetometer and can save this as png\textquotesingle{}s.  
+
+
+{\ttfamily \#include \char`\"{}CYd\+Lidar.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$raylib.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$raymath.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$termios.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{scanExporter_8cpp_adcb0238da0c7f7266008204628d1f4ab}\label{scanExporter_8cpp_adcb0238da0c7f7266008204628d1f4ab}} 
+\#define {\bfseries AMOUNT\+\_\+\+ROTATIONS}~15
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{scanExporter_8cpp_a6aa570a385f9c9496aa6f478a3706be1}{str\+Contains}} (char $\ast$str, char c)
+\begin{DoxyCompactList}\small\item\em Str\+Contains returns true if character c is in string str. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{scanExporter_8cpp_a34ad70a23d6ff321f48d62ea594193a3}{wrap\+Around}} (int n)
+\begin{DoxyCompactList}\small\item\em Wraps angles inbetween 0 and 360. \end{DoxyCompactList}\item 
+float \mbox{\hyperlink{scanExporter_8cpp_a41a9b0ea5713ed2db92e9862fe560e3c}{average\+Rotation}} (float $\ast$angles, int amount)
+\begin{DoxyCompactList}\small\item\em rotation averaging, takes in array \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{scanExporter_8cpp_a4f55795b0d34345712d6e3cedb22b958}{number\+Before\+Decimals}} (char $\ast$str)
+\begin{DoxyCompactList}\small\item\em returns true if there are numbers before the dot. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{scanExporter_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+renders lidar scans with raylib and applies rotation from magnetometer and can save this as png\textquotesingle{}s. 
+
+Lidar type\+: ydlidar x2l magnetometer sensor read via serial by pressing space you can save 1 scan as png renders using raylib (gpu accelerated) 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{scanExporter_8cpp_a41a9b0ea5713ed2db92e9862fe560e3c}\label{scanExporter_8cpp_a41a9b0ea5713ed2db92e9862fe560e3c}} 
+\index{scanExporter.cpp@{scanExporter.cpp}!averageRotation@{averageRotation}}
+\index{averageRotation@{averageRotation}!scanExporter.cpp@{scanExporter.cpp}}
+\doxysubsubsection{\texorpdfstring{averageRotation()}{averageRotation()}}
+{\footnotesize\ttfamily float average\+Rotation (\begin{DoxyParamCaption}\item[{float $\ast$}]{angles,  }\item[{int}]{amount }\end{DoxyParamCaption})}
+
+
+
+rotation averaging, takes in array 
+
+example array \{0, 360\} gets averaged to 0, not 180 averaging done by converting angles to vectors averaging them. Afterwords using atan2 to get an angle. Angles returned are often under 0, so be warned \mbox{\Hypertarget{scanExporter_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\label{scanExporter_8cpp_a0ddf1224851353fc92bfbff6f499fa97}} 
+\index{scanExporter.cpp@{scanExporter.cpp}!main@{main}}
+\index{main@{main}!scanExporter.cpp@{scanExporter.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+string property///////////////// Lidar ports
+
+lidar port
+
+ignore array
+
+int property///////////////// lidar baudrate
+
+tof lidar
+
+device type
+
+sample rate
+
+abnormal count
+
+bool property///////////////// fixed angle resolution
+
+rotate 180
+
+Counterclockwise
+
+one-\/way communication
+
+intensity
+
+Motor DTR
+
+Heart\+Beat
+
+float property///////////////// unit\+: °
+
+unit\+: m
+
+unit\+: Hz
+
+...\mbox{\Hypertarget{scanExporter_8cpp_a4f55795b0d34345712d6e3cedb22b958}\label{scanExporter_8cpp_a4f55795b0d34345712d6e3cedb22b958}} 
+\index{scanExporter.cpp@{scanExporter.cpp}!numberBeforeDecimals@{numberBeforeDecimals}}
+\index{numberBeforeDecimals@{numberBeforeDecimals}!scanExporter.cpp@{scanExporter.cpp}}
+\doxysubsubsection{\texorpdfstring{numberBeforeDecimals()}{numberBeforeDecimals()}}
+{\footnotesize\ttfamily bool number\+Before\+Decimals (\begin{DoxyParamCaption}\item[{char $\ast$}]{str }\end{DoxyParamCaption})}
+
+
+
+returns true if there are numbers before the dot. 
+
+\mbox{\Hypertarget{scanExporter_8cpp_a6aa570a385f9c9496aa6f478a3706be1}\label{scanExporter_8cpp_a6aa570a385f9c9496aa6f478a3706be1}} 
+\index{scanExporter.cpp@{scanExporter.cpp}!strContains@{strContains}}
+\index{strContains@{strContains}!scanExporter.cpp@{scanExporter.cpp}}
+\doxysubsubsection{\texorpdfstring{strContains()}{strContains()}}
+{\footnotesize\ttfamily bool str\+Contains (\begin{DoxyParamCaption}\item[{char $\ast$}]{str,  }\item[{char}]{c }\end{DoxyParamCaption})}
+
+
+
+Str\+Contains returns true if character c is in string str. 
+
+go\textquotesingle{}s through whole string until it finds the character c and returns true otherwise returns false \mbox{\Hypertarget{scanExporter_8cpp_a34ad70a23d6ff321f48d62ea594193a3}\label{scanExporter_8cpp_a34ad70a23d6ff321f48d62ea594193a3}} 
+\index{scanExporter.cpp@{scanExporter.cpp}!wrapAround@{wrapAround}}
+\index{wrapAround@{wrapAround}!scanExporter.cpp@{scanExporter.cpp}}
+\doxysubsubsection{\texorpdfstring{wrapAround()}{wrapAround()}}
+{\footnotesize\ttfamily int wrap\+Around (\begin{DoxyParamCaption}\item[{int}]{n }\end{DoxyParamCaption})}
+
+
+
+Wraps angles inbetween 0 and 360. 
+
+limits angles (int) inbetween the range 0 and 360 

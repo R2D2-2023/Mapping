@@ -1,0 +1,66 @@
+\hypertarget{visualDemo_8cpp}{}\doxysection{visual\+Demo.\+cpp File Reference}
+\label{visualDemo_8cpp}\index{visualDemo.cpp@{visualDemo.cpp}}
+
+
+visual demo, allows you to make a map but not save it  
+
+
+{\ttfamily \#include \char`\"{}CYd\+Lidar.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$raylib.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{visualDemo_8cpp_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+visual demo, allows you to make a map but not save it 
+
+Lidar type\+: ydlidar x2l everything is rendered using raylib (gpu accelerated) and renders to a render texture until the final step A blur filter is included for image similiarty detection, which meant to be used for automated mapping WASD can be used to move and space to add it to the map render texture 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{visualDemo_8cpp_a0ddf1224851353fc92bfbff6f499fa97}\label{visualDemo_8cpp_a0ddf1224851353fc92bfbff6f499fa97}} 
+\index{visualDemo.cpp@{visualDemo.cpp}!main@{main}}
+\index{main@{main}!visualDemo.cpp@{visualDemo.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+string property///////////////// Lidar ports
+
+lidar port
+
+ignore array
+
+int property///////////////// lidar baudrate
+
+tof lidar
+
+device type
+
+sample rate
+
+abnormal count
+
+bool property///////////////// fixed angle resolution
+
+rotate 180
+
+Counterclockwise
+
+one-\/way communication
+
+intensity
+
+Motor DTR
+
+Heart\+Beat
+
+float property///////////////// unit\+: °
+
+unit\+: m
+
+unit\+: Hz
