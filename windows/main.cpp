@@ -8,42 +8,63 @@
 #include <cstdlib>
 #include <string>
 
-
-void Rechtsafgaan() {
+/**
+ * @brief function to go right
+ * 
+ */
+void Right() {
     std::cout << "hier gaan we recht" << std::endl;
 }
 
-void Linksafgaan() {
+/**
+ * @brief function to go left
+ * 
+ */
+void Left() {
     std::cout << "hier gaan we links" << std::endl;
 }
 
-void Achteruitgaan() {
+/**
+ * @brief funtion to go back
+ * 
+ */
+void Back() {
     std::cout << "hier gaan we achteruit" << std::endl;
 }
 
-void driving(std::string a) {
-    if (a == "1") {
-        Rechtsafgaan();
+/**
+ * @brief for knowing which funtion to call
+ * 
+ * @param QR 
+ */
+void driving(std::string QR) {
+    if (QR == "1") {
+        Right();
         std::cout << "ik ben ook echt rechts gegaan" << std::endl;
     }
-    else if (a == "2") {
-        Linksafgaan();
+    else if (QR == "2") {
+        Left();
         std::cout << "ik ben ook echt links gegaan" << std::endl;
     }
-    else if (a == "3") {
-        Achteruitgaan();
+    else if (QR == "3") {
+        Back();
         std::cout << "ik ben ook echt achteruit gegaan" << std::endl;
     }
-    else if (a == "4") {
+    else if (QR == "4") {
         std::cout << "ik rij lekker recht door" << std::endl;
     }
     else {
         // open website url
-        std::string cmd = "start " + a;
+        std::string cmd = "start " + QR;
         system(cmd.c_str());
     }
 }
 
+/**
+ * @file main.cpp
+ * @brief for detection the QR-code using a camera
+ * 
+ */
 void detectQrCode()
 {
     // Open the camera
