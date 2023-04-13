@@ -1,0 +1,7 @@
+*.o
+*.exe
+*.svg
+Makefile
+_cpp_flags
+_linker_flags
+_linker_libs
