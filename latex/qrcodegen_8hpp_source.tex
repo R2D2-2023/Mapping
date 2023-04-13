@@ -1,0 +1,554 @@
+\hypertarget{qrcodegen_8hpp_source}{}\doxysection{qrcodegen.\+hpp}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00002\ \textcolor{comment}{\ *\ QR\ Code\ generator\ library\ (C++)}}
+\DoxyCodeLine{00003\ \textcolor{comment}{\ *\ }}
+\DoxyCodeLine{00004\ \textcolor{comment}{\ *\ Copyright\ (c)\ Project\ Nayuki.\ (MIT\ License)}}
+\DoxyCodeLine{00005\ \textcolor{comment}{\ *\ https://www.nayuki.io/page/qr-\/code-\/generator-\/library}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ }}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *\ Permission\ is\ hereby\ granted,\ free\ of\ charge,\ to\ any\ person\ obtaining\ a\ copy\ of}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ this\ software\ and\ associated\ documentation\ files\ (the\ "{}Software"{}),\ to\ deal\ in}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ the\ Software\ without\ restriction,\ including\ without\ limitation\ the\ rights\ to}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *\ use,\ copy,\ modify,\ merge,\ publish,\ distribute,\ sublicense,\ and/or\ sell\ copies\ of}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ the\ Software,\ and\ to\ permit\ persons\ to\ whom\ the\ Software\ is\ furnished\ to\ do\ so,}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *\ subject\ to\ the\ following\ conditions:}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ *\ -\/\ The\ above\ copyright\ notice\ and\ this\ permission\ notice\ shall\ be\ included\ in}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ *\ \ \ all\ copies\ or\ substantial\ portions\ of\ the\ Software.}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ *\ -\/\ The\ Software\ is\ provided\ "{}as\ is"{},\ without\ warranty\ of\ any\ kind,\ express\ or}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ *\ \ \ implied,\ including\ but\ not\ limited\ to\ the\ warranties\ of\ merchantability,}}
+\DoxyCodeLine{00017\ \textcolor{comment}{\ *\ \ \ fitness\ for\ a\ particular\ purpose\ and\ noninfringement.\ In\ no\ event\ shall\ the}}
+\DoxyCodeLine{00018\ \textcolor{comment}{\ *\ \ \ authors\ or\ copyright\ holders\ be\ liable\ for\ any\ claim,\ damages\ or\ other}}
+\DoxyCodeLine{00019\ \textcolor{comment}{\ *\ \ \ liability,\ whether\ in\ an\ action\ of\ contract,\ tort\ or\ otherwise,\ arising\ from,}}
+\DoxyCodeLine{00020\ \textcolor{comment}{\ *\ \ \ out\ of\ or\ in\ connection\ with\ the\ Software\ or\ the\ use\ or\ other\ dealings\ in\ the}}
+\DoxyCodeLine{00021\ \textcolor{comment}{\ *\ \ \ Software.}}
+\DoxyCodeLine{00022\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#include\ <array>}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#include\ <cstdint>}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#include\ <stdexcept>}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{keyword}{namespace\ }qrcodegen\ \{}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00036\ \textcolor{comment}{\ *\ A\ segment\ of\ character/binary/control\ data\ in\ a\ QR\ Code\ symbol.}}
+\DoxyCodeLine{00037\ \textcolor{comment}{\ *\ Instances\ of\ this\ class\ are\ immutable.}}
+\DoxyCodeLine{00038\ \textcolor{comment}{\ *\ The\ mid-\/level\ way\ to\ create\ a\ segment\ is\ to\ take\ the\ payload\ data}}
+\DoxyCodeLine{00039\ \textcolor{comment}{\ *\ and\ call\ a\ static\ factory\ function\ such\ as\ QrSegment::makeNumeric().}}
+\DoxyCodeLine{00040\ \textcolor{comment}{\ *\ The\ low-\/level\ way\ to\ create\ a\ segment\ is\ to\ custom-\/make\ the\ bit\ buffer}}
+\DoxyCodeLine{00041\ \textcolor{comment}{\ *\ and\ call\ the\ QrSegment()\ constructor\ with\ appropriate\ values.}}
+\DoxyCodeLine{00042\ \textcolor{comment}{\ *\ This\ segment\ class\ imposes\ no\ length\ restrictions,\ but\ QR\ Codes\ have\ restrictions.}}
+\DoxyCodeLine{00043\ \textcolor{comment}{\ *\ Even\ in\ the\ most\ favorable\ conditions,\ a\ QR\ Code\ can\ only\ hold\ 7089\ characters\ of\ data.}}
+\DoxyCodeLine{00044\ \textcolor{comment}{\ *\ Any\ segment\ longer\ than\ this\ is\ meaningless\ for\ the\ purpose\ of\ generating\ QR\ Codes.}}
+\DoxyCodeLine{00045\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00046\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{QrSegment}}\ final\ \{}
+\DoxyCodeLine{00047\ \ \ \ \ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Public\ helper\ enumeration\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00049\ \ \ \ \ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00051\ \textcolor{comment}{\ \ \ \ \ *\ Describes\ how\ a\ segment's\ data\ bits\ are\ interpreted.\ Immutable.}}
+\DoxyCodeLine{00052\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ final\ \{}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*-\/-\/\ Constants\ -\/-\/*/}}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ NUMERIC;}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ ALPHANUMERIC;}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ BYTE;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ KANJI;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ ECI;}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*-\/-\/\ Fields\ -\/-\/*/}}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ The\ mode\ indicator\ bits,\ which\ is\ a\ uint4\ value\ (range\ 0\ to\ 15).}}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ modeBits;}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Number\ of\ character\ count\ bits\ for\ three\ different\ version\ ranges.}}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ numBitsCharCount[3];}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00072\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*-\/-\/\ Constructor\ -\/-\/*/}}
+\DoxyCodeLine{00074\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keyword}{private}:\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}(\textcolor{keywordtype}{int}\ mode,\ \textcolor{keywordtype}{int}\ cc0,\ \textcolor{keywordtype}{int}\ cc1,\ \textcolor{keywordtype}{int}\ cc2);}
+\DoxyCodeLine{00076\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*-\/-\/\ Methods\ -\/-\/*/}}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00081\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ (Package-\/private)\ Returns\ the\ mode\ indicator\ bits,\ which\ is\ an\ unsigned\ 4-\/bit\ value\ (range\ 0\ to\ 15).}}
+\DoxyCodeLine{00082\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{int}\ getModeBits()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00085\ \ \ \ \ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00086\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ (Package-\/private)\ Returns\ the\ bit\ width\ of\ the\ character\ count\ field\ for\ a\ segment\ in}}
+\DoxyCodeLine{00087\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ *\ this\ mode\ in\ a\ QR\ Code\ at\ the\ given\ version\ number.\ The\ result\ is\ in\ the\ range\ [0,\ 16].}}
+\DoxyCodeLine{00088\ \textcolor{comment}{\ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{int}\ numCharCountBits(\textcolor{keywordtype}{int}\ ver)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00091\ \ \ \ \ \};}
+\DoxyCodeLine{00092\ \ \ \ \ }
+\DoxyCodeLine{00093\ \ \ \ \ }
+\DoxyCodeLine{00094\ \ \ \ \ }
+\DoxyCodeLine{00095\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Static\ factory\ functions\ (mid\ level)\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00096\ \ \ \ \ }
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00098\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ segment\ representing\ the\ given\ binary\ data\ encoded\ in}}
+\DoxyCodeLine{00099\ \textcolor{comment}{\ \ \ \ \ *\ byte\ mode.\ All\ input\ byte\ vectors\ are\ acceptable.\ Any\ text\ string}}
+\DoxyCodeLine{00100\ \textcolor{comment}{\ \ \ \ \ *\ can\ be\ converted\ to\ UTF-\/8\ bytes\ and\ encoded\ as\ a\ byte\ mode\ segment.}}
+\DoxyCodeLine{00101\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{QrSegment}}\ makeBytes(\textcolor{keyword}{const}\ std::vector<std::uint8\_t>\ \&data);}
+\DoxyCodeLine{00103\ \ \ \ \ }
+\DoxyCodeLine{00104\ \ \ \ \ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00106\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ segment\ representing\ the\ given\ string\ of\ decimal\ digits\ encoded\ in\ numeric\ mode.}}
+\DoxyCodeLine{00107\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{QrSegment}}\ makeNumeric(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *digits);}
+\DoxyCodeLine{00109\ \ \ \ \ }
+\DoxyCodeLine{00110\ \ \ \ \ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00112\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ segment\ representing\ the\ given\ text\ string\ encoded\ in\ alphanumeric\ mode.}}
+\DoxyCodeLine{00113\ \textcolor{comment}{\ \ \ \ \ *\ The\ characters\ allowed\ are:\ 0\ to\ 9,\ A\ to\ Z\ (uppercase\ only),\ space,}}
+\DoxyCodeLine{00114\ \textcolor{comment}{\ \ \ \ \ *\ dollar,\ percent,\ asterisk,\ plus,\ hyphen,\ period,\ slash,\ colon.}}
+\DoxyCodeLine{00115\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00116\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{QrSegment}}\ makeAlphanumeric(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *text);}
+\DoxyCodeLine{00117\ \ \ \ \ }
+\DoxyCodeLine{00118\ \ \ \ \ }
+\DoxyCodeLine{00119\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00120\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ list\ of\ zero\ or\ more\ segments\ to\ represent\ the\ given\ text\ string.\ The\ result}}
+\DoxyCodeLine{00121\ \textcolor{comment}{\ \ \ \ \ *\ may\ use\ various\ segment\ modes\ and\ switch\ modes\ to\ optimize\ the\ length\ of\ the\ bit\ stream.}}
+\DoxyCodeLine{00122\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ std::vector<QrSegment>\ makeSegments(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *text);}
+\DoxyCodeLine{00124\ \ \ \ \ }
+\DoxyCodeLine{00125\ \ \ \ \ }
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00127\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ segment\ representing\ an\ Extended\ Channel\ Interpretation}}
+\DoxyCodeLine{00128\ \textcolor{comment}{\ \ \ \ \ *\ (ECI)\ designator\ with\ the\ given\ assignment\ value.}}
+\DoxyCodeLine{00129\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{QrSegment}}\ makeEci(\textcolor{keywordtype}{long}\ assignVal);}
+\DoxyCodeLine{00131\ \ \ \ \ }
+\DoxyCodeLine{00132\ \ \ \ \ }
+\DoxyCodeLine{00133\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Public\ static\ helper\ functions\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00134\ \ \ \ \ }
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00136\ \textcolor{comment}{\ \ \ \ \ *\ Tests\ whether\ the\ given\ string\ can\ be\ encoded\ as\ a\ segment\ in\ numeric\ mode.}}
+\DoxyCodeLine{00137\ \textcolor{comment}{\ \ \ \ \ *\ A\ string\ is\ encodable\ iff\ each\ character\ is\ in\ the\ range\ 0\ to\ 9.}}
+\DoxyCodeLine{00138\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00139\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ isNumeric(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *text);}
+\DoxyCodeLine{00140\ \ \ \ \ }
+\DoxyCodeLine{00141\ \ \ \ \ }
+\DoxyCodeLine{00142\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00143\ \textcolor{comment}{\ \ \ \ \ *\ Tests\ whether\ the\ given\ string\ can\ be\ encoded\ as\ a\ segment\ in\ alphanumeric\ mode.}}
+\DoxyCodeLine{00144\ \textcolor{comment}{\ \ \ \ \ *\ A\ string\ is\ encodable\ iff\ each\ character\ is\ in\ the\ following\ set:\ 0\ to\ 9,\ A\ to\ Z}}
+\DoxyCodeLine{00145\ \textcolor{comment}{\ \ \ \ \ *\ (uppercase\ only),\ space,\ dollar,\ percent,\ asterisk,\ plus,\ hyphen,\ period,\ slash,\ colon.}}
+\DoxyCodeLine{00146\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00147\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ isAlphanumeric(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *text);}
+\DoxyCodeLine{00148\ \ \ \ \ }
+\DoxyCodeLine{00149\ \ \ \ \ }
+\DoxyCodeLine{00150\ \ \ \ \ }
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Instance\ fields\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00152\ \ \ \ \ }
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{comment}{/*\ The\ mode\ indicator\ of\ this\ segment.\ Accessed\ through\ getMode().\ */}}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ *mode;}
+\DoxyCodeLine{00155\ \ \ \ \ }
+\DoxyCodeLine{00156\ \ \ \ \ \textcolor{comment}{/*\ The\ length\ of\ this\ segment's\ unencoded\ data.\ Measured\ in\ characters\ for}}
+\DoxyCodeLine{00157\ \textcolor{comment}{\ \ \ \ \ *\ numeric/alphanumeric/kanji\ mode,\ bytes\ for\ byte\ mode,\ and\ 0\ for\ ECI\ mode.}}
+\DoxyCodeLine{00158\ \textcolor{comment}{\ \ \ \ \ *\ Always\ zero\ or\ positive.\ Not\ the\ same\ as\ the\ data's\ bit\ length.}}
+\DoxyCodeLine{00159\ \textcolor{comment}{\ \ \ \ \ *\ Accessed\ through\ getNumChars().\ */}}
+\DoxyCodeLine{00160\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ numChars;}
+\DoxyCodeLine{00161\ \ \ \ \ }
+\DoxyCodeLine{00162\ \ \ \ \ \textcolor{comment}{/*\ The\ data\ bits\ of\ this\ segment.\ Accessed\ through\ getData().\ */}}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keyword}{private}:\ std::vector<bool>\ data;}
+\DoxyCodeLine{00164\ \ \ \ \ }
+\DoxyCodeLine{00165\ \ \ \ \ }
+\DoxyCodeLine{00166\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Constructors\ (low\ level)\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00167\ \ \ \ \ }
+\DoxyCodeLine{00168\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00169\ \textcolor{comment}{\ \ \ \ \ *\ Creates\ a\ new\ QR\ Code\ segment\ with\ the\ given\ attributes\ and\ data.}}
+\DoxyCodeLine{00170\ \textcolor{comment}{\ \ \ \ \ *\ The\ character\ count\ (numCh)\ must\ agree\ with\ the\ mode\ and\ the\ bit\ buffer\ length,}}
+\DoxyCodeLine{00171\ \textcolor{comment}{\ \ \ \ \ *\ but\ the\ constraint\ isn't\ checked.\ The\ given\ bit\ buffer\ is\ copied\ and\ stored.}}
+\DoxyCodeLine{00172\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keyword}{public}:\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{QrSegment}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ \&md,\ \textcolor{keywordtype}{int}\ numCh,\ \textcolor{keyword}{const}\ std::vector<bool>\ \&dt);}
+\DoxyCodeLine{00174\ \ \ \ \ }
+\DoxyCodeLine{00175\ \ \ \ \ }
+\DoxyCodeLine{00176\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00177\ \textcolor{comment}{\ \ \ \ \ *\ Creates\ a\ new\ QR\ Code\ segment\ with\ the\ given\ parameters\ and\ data.}}
+\DoxyCodeLine{00178\ \textcolor{comment}{\ \ \ \ \ *\ The\ character\ count\ (numCh)\ must\ agree\ with\ the\ mode\ and\ the\ bit\ buffer\ length,}}
+\DoxyCodeLine{00179\ \textcolor{comment}{\ \ \ \ \ *\ but\ the\ constraint\ isn't\ checked.\ The\ given\ bit\ buffer\ is\ moved\ and\ stored.}}
+\DoxyCodeLine{00180\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{keyword}{public}:\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{QrSegment}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ \&md,\ \textcolor{keywordtype}{int}\ numCh,\ std::vector<bool>\ \&\&dt);}
+\DoxyCodeLine{00182\ \ \ \ \ }
+\DoxyCodeLine{00183\ \ \ \ \ }
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Methods\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00185\ \ \ \ \ }
+\DoxyCodeLine{00186\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00187\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ the\ mode\ field\ of\ this\ segment.}}
+\DoxyCodeLine{00188\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00189\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{const}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}\ \&getMode()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00190\ \ \ \ \ }
+\DoxyCodeLine{00191\ \ \ \ \ }
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00193\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ the\ character\ count\ field\ of\ this\ segment.}}
+\DoxyCodeLine{00194\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00195\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{int}\ getNumChars()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00196\ \ \ \ \ }
+\DoxyCodeLine{00197\ \ \ \ \ }
+\DoxyCodeLine{00198\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00199\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ the\ data\ bits\ of\ this\ segment.}}
+\DoxyCodeLine{00200\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00201\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{const}\ std::vector<bool>\ \&getData()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00202\ \ \ \ \ }
+\DoxyCodeLine{00203\ \ \ \ \ }
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{comment}{//\ (Package-\/private)\ Calculates\ the\ number\ of\ bits\ needed\ to\ encode\ the\ given\ segments\ at}}
+\DoxyCodeLine{00205\ \ \ \ \ \textcolor{comment}{//\ the\ given\ version.\ Returns\ a\ non-\/negative\ number\ if\ successful.\ Otherwise\ returns\ -\/1\ if\ a}}
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{comment}{//\ segment\ has\ too\ many\ characters\ to\ fit\ its\ length\ field,\ or\ the\ total\ bits\ exceeds\ INT\_MAX.}}
+\DoxyCodeLine{00207\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ getTotalBits(\textcolor{keyword}{const}\ std::vector<QrSegment>\ \&segs,\ \textcolor{keywordtype}{int}\ version);}
+\DoxyCodeLine{00208\ \ \ \ \ }
+\DoxyCodeLine{00209\ \ \ \ \ }
+\DoxyCodeLine{00210\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Private\ constant\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00211\ \ \ \ \ }
+\DoxyCodeLine{00212\ \ \ \ \ \textcolor{comment}{/*\ The\ set\ of\ all\ legal\ characters\ in\ alphanumeric\ mode,\ where}}
+\DoxyCodeLine{00213\ \textcolor{comment}{\ \ \ \ \ *\ each\ character\ value\ maps\ to\ the\ index\ in\ the\ string.\ */}}
+\DoxyCodeLine{00214\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *ALPHANUMERIC\_CHARSET;}
+\DoxyCodeLine{00215\ \ \ \ \ }
+\DoxyCodeLine{00216\ \};}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00219\ }
+\DoxyCodeLine{00220\ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00221\ \textcolor{comment}{\ *\ A\ QR\ Code\ symbol,\ which\ is\ a\ type\ of\ two-\/dimension\ barcode.}}
+\DoxyCodeLine{00222\ \textcolor{comment}{\ *\ Invented\ by\ Denso\ Wave\ and\ described\ in\ the\ ISO/IEC\ 18004\ standard.}}
+\DoxyCodeLine{00223\ \textcolor{comment}{\ *\ Instances\ of\ this\ class\ represent\ an\ immutable\ square\ grid\ of\ dark\ and\ light\ cells.}}
+\DoxyCodeLine{00224\ \textcolor{comment}{\ *\ The\ class\ provides\ static\ factory\ functions\ to\ create\ a\ QR\ Code\ from\ text\ or\ binary\ data.}}
+\DoxyCodeLine{00225\ \textcolor{comment}{\ *\ The\ class\ covers\ the\ QR\ Code\ Model\ 2\ specification,\ supporting\ all\ versions\ (sizes)}}
+\DoxyCodeLine{00226\ \textcolor{comment}{\ *\ from\ 1\ to\ 40,\ all\ 4\ error\ correction\ levels,\ and\ 4\ character\ encoding\ modes.}}
+\DoxyCodeLine{00227\ \textcolor{comment}{\ *\ }}
+\DoxyCodeLine{00228\ \textcolor{comment}{\ *\ Ways\ to\ create\ a\ QR\ Code\ object:}}
+\DoxyCodeLine{00229\ \textcolor{comment}{\ *\ -\/\ High\ level:\ Take\ the\ payload\ data\ and\ call\ QrCode::encodeText()\ or\ QrCode::encodeBinary().}}
+\DoxyCodeLine{00230\ \textcolor{comment}{\ *\ -\/\ Mid\ level:\ Custom-\/make\ the\ list\ of\ segments\ and\ call\ QrCode::encodeSegments().}}
+\DoxyCodeLine{00231\ \textcolor{comment}{\ *\ -\/\ Low\ level:\ Custom-\/make\ the\ array\ of\ data\ codeword\ bytes\ (including}}
+\DoxyCodeLine{00232\ \textcolor{comment}{\ *\ \ \ segment\ headers\ and\ final\ padding,\ excluding\ error\ correction\ codewords),}}
+\DoxyCodeLine{00233\ \textcolor{comment}{\ *\ \ \ supply\ the\ appropriate\ version\ number,\ and\ call\ the\ QrCode()\ constructor.}}
+\DoxyCodeLine{00234\ \textcolor{comment}{\ *\ (Note\ that\ all\ ways\ require\ supplying\ the\ desired\ error\ correction\ level.)}}
+\DoxyCodeLine{00235\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00236\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classqrcodegen_1_1_qr_code}{QrCode}}\ final\ \{}
+\DoxyCodeLine{00237\ \ \ \ \ }
+\DoxyCodeLine{00238\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Public\ helper\ enumeration\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00239\ \ \ \ \ }
+\DoxyCodeLine{00240\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00241\ \textcolor{comment}{\ \ \ \ \ *\ The\ error\ correction\ level\ in\ a\ QR\ Code\ symbol.}}
+\DoxyCodeLine{00242\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00243\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{enum\ class}\ Ecc\ \{}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \ \ LOW\ =\ 0\ ,\ \ \textcolor{comment}{//\ The\ QR\ Code\ can\ tolerate\ about\ \ 7\%\ erroneous\ codewords}}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ \ \ MEDIUM\ \ ,\ \ \textcolor{comment}{//\ The\ QR\ Code\ can\ tolerate\ about\ 15\%\ erroneous\ codewords}}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \ \ QUARTILE,\ \ \textcolor{comment}{//\ The\ QR\ Code\ can\ tolerate\ about\ 25\%\ erroneous\ codewords}}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ HIGH\ \ \ \ ,\ \ \textcolor{comment}{//\ The\ QR\ Code\ can\ tolerate\ about\ 30\%\ erroneous\ codewords}}
+\DoxyCodeLine{00248\ \ \ \ \ \};}
+\DoxyCodeLine{00249\ \ \ \ \ }
+\DoxyCodeLine{00250\ \ \ \ \ }
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{comment}{//\ Returns\ a\ value\ in\ the\ range\ 0\ to\ 3\ (unsigned\ 2-\/bit\ integer).}}
+\DoxyCodeLine{00252\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ getFormatBits(Ecc\ ecl);}
+\DoxyCodeLine{00253\ \ \ \ \ }
+\DoxyCodeLine{00254\ \ \ \ \ }
+\DoxyCodeLine{00255\ \ \ \ \ }
+\DoxyCodeLine{00256\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Static\ factory\ functions\ (high\ level)\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00257\ \ \ \ \ }
+\DoxyCodeLine{00258\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00259\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ QR\ Code\ representing\ the\ given\ Unicode\ text\ string\ at\ the\ given\ error\ correction\ level.}}
+\DoxyCodeLine{00260\ \textcolor{comment}{\ \ \ \ \ *\ As\ a\ conservative\ upper\ bound,\ this\ function\ is\ guaranteed\ to\ succeed\ for\ strings\ that\ have\ 2953\ or\ fewer}}
+\DoxyCodeLine{00261\ \textcolor{comment}{\ \ \ \ \ *\ UTF-\/8\ code\ units\ (not\ Unicode\ code\ points)\ if\ the\ low\ error\ correction\ level\ is\ used.\ The\ smallest\ possible}}
+\DoxyCodeLine{00262\ \textcolor{comment}{\ \ \ \ \ *\ QR\ Code\ version\ is\ automatically\ chosen\ for\ the\ output.\ The\ ECC\ level\ of\ the\ result\ may\ be\ higher\ than}}
+\DoxyCodeLine{00263\ \textcolor{comment}{\ \ \ \ \ *\ the\ ecl\ argument\ if\ it\ can\ be\ done\ without\ increasing\ the\ version.}}
+\DoxyCodeLine{00264\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00265\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_code}{QrCode}}\ encodeText(\textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ *text,\ Ecc\ ecl);}
+\DoxyCodeLine{00266\ \ \ \ \ }
+\DoxyCodeLine{00267\ \ \ \ \ }
+\DoxyCodeLine{00268\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00269\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ QR\ Code\ representing\ the\ given\ binary\ data\ at\ the\ given\ error\ correction\ level.}}
+\DoxyCodeLine{00270\ \textcolor{comment}{\ \ \ \ \ *\ This\ function\ always\ encodes\ using\ the\ binary\ segment\ mode,\ not\ any\ text\ mode.\ The\ maximum\ number\ of}}
+\DoxyCodeLine{00271\ \textcolor{comment}{\ \ \ \ \ *\ bytes\ allowed\ is\ 2953.\ The\ smallest\ possible\ QR\ Code\ version\ is\ automatically\ chosen\ for\ the\ output.}}
+\DoxyCodeLine{00272\ \textcolor{comment}{\ \ \ \ \ *\ The\ ECC\ level\ of\ the\ result\ may\ be\ higher\ than\ the\ ecl\ argument\ if\ it\ can\ be\ done\ without\ increasing\ the\ version.}}
+\DoxyCodeLine{00273\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_code}{QrCode}}\ encodeBinary(\textcolor{keyword}{const}\ std::vector<std::uint8\_t>\ \&data,\ Ecc\ ecl);}
+\DoxyCodeLine{00275\ \ \ \ \ }
+\DoxyCodeLine{00276\ \ \ \ \ }
+\DoxyCodeLine{00277\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Static\ factory\ functions\ (mid\ level)\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00278\ \ \ \ \ }
+\DoxyCodeLine{00279\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00280\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ a\ QR\ Code\ representing\ the\ given\ segments\ with\ the\ given\ encoding\ parameters.}}
+\DoxyCodeLine{00281\ \textcolor{comment}{\ \ \ \ \ *\ The\ smallest\ possible\ QR\ Code\ version\ within\ the\ given\ range\ is\ automatically}}
+\DoxyCodeLine{00282\ \textcolor{comment}{\ \ \ \ \ *\ chosen\ for\ the\ output.\ Iff\ boostEcl\ is\ true,\ then\ the\ ECC\ level\ of\ the\ result}}
+\DoxyCodeLine{00283\ \textcolor{comment}{\ \ \ \ \ *\ may\ be\ higher\ than\ the\ ecl\ argument\ if\ it\ can\ be\ done\ without\ increasing\ the}}
+\DoxyCodeLine{00284\ \textcolor{comment}{\ \ \ \ \ *\ version.\ The\ mask\ number\ is\ either\ between\ 0\ to\ 7\ (inclusive)\ to\ force\ that}}
+\DoxyCodeLine{00285\ \textcolor{comment}{\ \ \ \ \ *\ mask,\ or\ -\/1\ to\ automatically\ choose\ an\ appropriate\ mask\ (which\ may\ be\ slow).}}
+\DoxyCodeLine{00286\ \textcolor{comment}{\ \ \ \ \ *\ This\ function\ allows\ the\ user\ to\ create\ a\ custom\ sequence\ of\ segments\ that\ switches}}
+\DoxyCodeLine{00287\ \textcolor{comment}{\ \ \ \ \ *\ between\ modes\ (such\ as\ alphanumeric\ and\ byte)\ to\ encode\ text\ in\ less\ space.}}
+\DoxyCodeLine{00288\ \textcolor{comment}{\ \ \ \ \ *\ This\ is\ a\ mid-\/level\ API;\ the\ high-\/level\ API\ is\ encodeText()\ and\ encodeBinary().}}
+\DoxyCodeLine{00289\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00290\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \mbox{\hyperlink{classqrcodegen_1_1_qr_code}{QrCode}}\ encodeSegments(\textcolor{keyword}{const}\ std::vector<QrSegment>\ \&segs,\ Ecc\ ecl,}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ minVersion=1,\ \textcolor{keywordtype}{int}\ maxVersion=40,\ \textcolor{keywordtype}{int}\ mask=-\/1,\ \textcolor{keywordtype}{bool}\ boostEcl=\textcolor{keyword}{true});\ \ \textcolor{comment}{//\ All\ optional\ parameters}}
+\DoxyCodeLine{00292\ \ \ \ \ }
+\DoxyCodeLine{00293\ \ \ \ \ }
+\DoxyCodeLine{00294\ \ \ \ \ }
+\DoxyCodeLine{00295\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Instance\ fields\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00296\ \ \ \ \ }
+\DoxyCodeLine{00297\ \ \ \ \ \textcolor{comment}{//\ Immutable\ scalar\ parameters:}}
+\DoxyCodeLine{00298\ \ \ \ \ }
+\DoxyCodeLine{00299\ \ \ \ \ \textcolor{comment}{/*\ The\ version\ number\ of\ this\ QR\ Code,\ which\ is\ between\ 1\ and\ 40\ (inclusive).}}
+\DoxyCodeLine{00300\ \textcolor{comment}{\ \ \ \ \ *\ This\ determines\ the\ size\ of\ this\ barcode.\ */}}
+\DoxyCodeLine{00301\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ version;}
+\DoxyCodeLine{00302\ \ \ \ \ }
+\DoxyCodeLine{00303\ \ \ \ \ \textcolor{comment}{/*\ The\ width\ and\ height\ of\ this\ QR\ Code,\ measured\ in\ modules,\ between}}
+\DoxyCodeLine{00304\ \textcolor{comment}{\ \ \ \ \ *\ 21\ and\ 177\ (inclusive).\ This\ is\ equal\ to\ version\ *\ 4\ +\ 17.\ */}}
+\DoxyCodeLine{00305\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ size;}
+\DoxyCodeLine{00306\ \ \ \ \ }
+\DoxyCodeLine{00307\ \ \ \ \ \textcolor{comment}{/*\ The\ error\ correction\ level\ used\ in\ this\ QR\ Code.\ */}}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keyword}{private}:\ Ecc\ errorCorrectionLevel;}
+\DoxyCodeLine{00309\ \ \ \ \ }
+\DoxyCodeLine{00310\ \ \ \ \ \textcolor{comment}{/*\ The\ index\ of\ the\ mask\ pattern\ used\ in\ this\ QR\ Code,\ which\ is\ between\ 0\ and\ 7\ (inclusive).}}
+\DoxyCodeLine{00311\ \textcolor{comment}{\ \ \ \ \ *\ Even\ if\ a\ QR\ Code\ is\ created\ with\ automatic\ masking\ requested\ (mask\ =\ -\/1),}}
+\DoxyCodeLine{00312\ \textcolor{comment}{\ \ \ \ \ *\ the\ resulting\ object\ still\ has\ a\ mask\ value\ between\ 0\ and\ 7.\ */}}
+\DoxyCodeLine{00313\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ mask;}
+\DoxyCodeLine{00314\ \ \ \ \ }
+\DoxyCodeLine{00315\ \ \ \ \ \textcolor{comment}{//\ Private\ grids\ of\ modules/pixels,\ with\ dimensions\ of\ size*size:}}
+\DoxyCodeLine{00316\ \ \ \ \ }
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{comment}{//\ The\ modules\ of\ this\ QR\ Code\ (false\ =\ light,\ true\ =\ dark).}}
+\DoxyCodeLine{00318\ \ \ \ \ \textcolor{comment}{//\ Immutable\ after\ constructor\ finishes.\ Accessed\ through\ getModule().}}
+\DoxyCodeLine{00319\ \ \ \ \ \textcolor{keyword}{private}:\ std::vector<std::vector<bool>\ >\ modules;}
+\DoxyCodeLine{00320\ \ \ \ \ }
+\DoxyCodeLine{00321\ \ \ \ \ \textcolor{comment}{//\ Indicates\ function\ modules\ that\ are\ not\ subjected\ to\ masking.\ Discarded\ when\ constructor\ finishes.}}
+\DoxyCodeLine{00322\ \ \ \ \ \textcolor{keyword}{private}:\ std::vector<std::vector<bool>\ >\ isFunction;}
+\DoxyCodeLine{00323\ \ \ \ \ }
+\DoxyCodeLine{00324\ \ \ \ \ }
+\DoxyCodeLine{00325\ \ \ \ \ }
+\DoxyCodeLine{00326\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Constructor\ (low\ level)\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00327\ \ \ \ \ }
+\DoxyCodeLine{00328\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00329\ \textcolor{comment}{\ \ \ \ \ *\ Creates\ a\ new\ QR\ Code\ with\ the\ given\ version\ number,}}
+\DoxyCodeLine{00330\ \textcolor{comment}{\ \ \ \ \ *\ error\ correction\ level,\ data\ codeword\ bytes,\ and\ mask\ number.}}
+\DoxyCodeLine{00331\ \textcolor{comment}{\ \ \ \ \ *\ This\ is\ a\ low-\/level\ API\ that\ most\ users\ should\ not\ use\ directly.}}
+\DoxyCodeLine{00332\ \textcolor{comment}{\ \ \ \ \ *\ A\ mid-\/level\ API\ is\ the\ encodeSegments()\ function.}}
+\DoxyCodeLine{00333\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00334\ \ \ \ \ \textcolor{keyword}{public}:\ \mbox{\hyperlink{classqrcodegen_1_1_qr_code}{QrCode}}(\textcolor{keywordtype}{int}\ ver,\ Ecc\ ecl,\ \textcolor{keyword}{const}\ std::vector<std::uint8\_t>\ \&dataCodewords,\ \textcolor{keywordtype}{int}\ msk);}
+\DoxyCodeLine{00335\ \ \ \ \ }
+\DoxyCodeLine{00336\ \ \ \ \ }
+\DoxyCodeLine{00337\ \ \ \ \ }
+\DoxyCodeLine{00338\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Public\ instance\ methods\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00339\ \ \ \ \ }
+\DoxyCodeLine{00340\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00341\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ this\ QR\ Code's\ version,\ in\ the\ range\ [1,\ 40].}}
+\DoxyCodeLine{00342\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00343\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{int}\ getVersion()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00344\ \ \ \ \ }
+\DoxyCodeLine{00345\ \ \ \ \ }
+\DoxyCodeLine{00346\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00347\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ this\ QR\ Code's\ size,\ in\ the\ range\ [21,\ 177].}}
+\DoxyCodeLine{00348\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00349\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{int}\ getSize()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00350\ \ \ \ \ }
+\DoxyCodeLine{00351\ \ \ \ \ }
+\DoxyCodeLine{00352\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00353\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ this\ QR\ Code's\ error\ correction\ level.}}
+\DoxyCodeLine{00354\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00355\ \ \ \ \ \textcolor{keyword}{public}:\ Ecc\ getErrorCorrectionLevel()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00356\ \ \ \ \ }
+\DoxyCodeLine{00357\ \ \ \ \ }
+\DoxyCodeLine{00358\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00359\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ this\ QR\ Code's\ mask,\ in\ the\ range\ [0,\ 7].}}
+\DoxyCodeLine{00360\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00361\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{int}\ getMask()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00362\ \ \ \ \ }
+\DoxyCodeLine{00363\ \ \ \ \ }
+\DoxyCodeLine{00364\ \ \ \ \ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00365\ \textcolor{comment}{\ \ \ \ \ *\ Returns\ the\ color\ of\ the\ module\ (pixel)\ at\ the\ given\ coordinates,\ which\ is\ false}}
+\DoxyCodeLine{00366\ \textcolor{comment}{\ \ \ \ \ *\ for\ light\ or\ true\ for\ dark.\ The\ top\ left\ corner\ has\ the\ coordinates\ (x=0,\ y=0).}}
+\DoxyCodeLine{00367\ \textcolor{comment}{\ \ \ \ \ *\ If\ the\ given\ coordinates\ are\ out\ of\ bounds,\ then\ false\ (light)\ is\ returned.}}
+\DoxyCodeLine{00368\ \textcolor{comment}{\ \ \ \ \ */}}
+\DoxyCodeLine{00369\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{bool}\ getModule(\textcolor{keywordtype}{int}\ x,\ \textcolor{keywordtype}{int}\ y)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00370\ \ \ \ \ }
+\DoxyCodeLine{00371\ \ \ \ \ }
+\DoxyCodeLine{00372\ \ \ \ \ }
+\DoxyCodeLine{00373\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Private\ helper\ methods\ for\ constructor:\ Drawing\ function\ modules\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00374\ \ \ \ \ }
+\DoxyCodeLine{00375\ \ \ \ \ \textcolor{comment}{//\ Reads\ this\ object's\ version\ field,\ and\ draws\ and\ marks\ all\ function\ modules.}}
+\DoxyCodeLine{00376\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ drawFunctionPatterns();}
+\DoxyCodeLine{00377\ \ \ \ \ }
+\DoxyCodeLine{00378\ \ \ \ \ }
+\DoxyCodeLine{00379\ \ \ \ \ \textcolor{comment}{//\ Draws\ two\ copies\ of\ the\ format\ bits\ (with\ its\ own\ error\ correction\ code)}}
+\DoxyCodeLine{00380\ \ \ \ \ \textcolor{comment}{//\ based\ on\ the\ given\ mask\ and\ this\ object's\ error\ correction\ level\ field.}}
+\DoxyCodeLine{00381\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ drawFormatBits(\textcolor{keywordtype}{int}\ msk);}
+\DoxyCodeLine{00382\ \ \ \ \ }
+\DoxyCodeLine{00383\ \ \ \ \ }
+\DoxyCodeLine{00384\ \ \ \ \ \textcolor{comment}{//\ Draws\ two\ copies\ of\ the\ version\ bits\ (with\ its\ own\ error\ correction\ code),}}
+\DoxyCodeLine{00385\ \ \ \ \ \textcolor{comment}{//\ based\ on\ this\ object's\ version\ field,\ iff\ 7\ <=\ version\ <=\ 40.}}
+\DoxyCodeLine{00386\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ drawVersion();}
+\DoxyCodeLine{00387\ \ \ \ \ }
+\DoxyCodeLine{00388\ \ \ \ \ }
+\DoxyCodeLine{00389\ \ \ \ \ \textcolor{comment}{//\ Draws\ a\ 9*9\ finder\ pattern\ including\ the\ border\ separator,}}
+\DoxyCodeLine{00390\ \ \ \ \ \textcolor{comment}{//\ with\ the\ center\ module\ at\ (x,\ y).\ Modules\ can\ be\ out\ of\ bounds.}}
+\DoxyCodeLine{00391\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ drawFinderPattern(\textcolor{keywordtype}{int}\ x,\ \textcolor{keywordtype}{int}\ y);}
+\DoxyCodeLine{00392\ \ \ \ \ }
+\DoxyCodeLine{00393\ \ \ \ \ }
+\DoxyCodeLine{00394\ \ \ \ \ \textcolor{comment}{//\ Draws\ a\ 5*5\ alignment\ pattern,\ with\ the\ center\ module}}
+\DoxyCodeLine{00395\ \ \ \ \ \textcolor{comment}{//\ at\ (x,\ y).\ All\ modules\ must\ be\ in\ bounds.}}
+\DoxyCodeLine{00396\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ drawAlignmentPattern(\textcolor{keywordtype}{int}\ x,\ \textcolor{keywordtype}{int}\ y);}
+\DoxyCodeLine{00397\ \ \ \ \ }
+\DoxyCodeLine{00398\ \ \ \ \ }
+\DoxyCodeLine{00399\ \ \ \ \ \textcolor{comment}{//\ Sets\ the\ color\ of\ a\ module\ and\ marks\ it\ as\ a\ function\ module.}}
+\DoxyCodeLine{00400\ \ \ \ \ \textcolor{comment}{//\ Only\ used\ by\ the\ constructor.\ Coordinates\ must\ be\ in\ bounds.}}
+\DoxyCodeLine{00401\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ setFunctionModule(\textcolor{keywordtype}{int}\ x,\ \textcolor{keywordtype}{int}\ y,\ \textcolor{keywordtype}{bool}\ isDark);}
+\DoxyCodeLine{00402\ \ \ \ \ }
+\DoxyCodeLine{00403\ \ \ \ \ }
+\DoxyCodeLine{00404\ \ \ \ \ \textcolor{comment}{//\ Returns\ the\ color\ of\ the\ module\ at\ the\ given\ coordinates,\ which\ must\ be\ in\ range.}}
+\DoxyCodeLine{00405\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{bool}\ module(\textcolor{keywordtype}{int}\ x,\ \textcolor{keywordtype}{int}\ y)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00406\ \ \ \ \ }
+\DoxyCodeLine{00407\ \ \ \ \ }
+\DoxyCodeLine{00408\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Private\ helper\ methods\ for\ constructor:\ Codewords\ and\ masking\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00409\ \ \ \ \ }
+\DoxyCodeLine{00410\ \ \ \ \ \textcolor{comment}{//\ Returns\ a\ new\ byte\ string\ representing\ the\ given\ data\ with\ the\ appropriate\ error\ correction}}
+\DoxyCodeLine{00411\ \ \ \ \ \textcolor{comment}{//\ codewords\ appended\ to\ it,\ based\ on\ this\ object's\ version\ and\ error\ correction\ level.}}
+\DoxyCodeLine{00412\ \ \ \ \ \textcolor{keyword}{private}:\ std::vector<std::uint8\_t>\ addEccAndInterleave(\textcolor{keyword}{const}\ std::vector<std::uint8\_t>\ \&data)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00413\ \ \ \ \ }
+\DoxyCodeLine{00414\ \ \ \ \ }
+\DoxyCodeLine{00415\ \ \ \ \ \textcolor{comment}{//\ Draws\ the\ given\ sequence\ of\ 8-\/bit\ codewords\ (data\ and\ error\ correction)\ onto\ the\ entire}}
+\DoxyCodeLine{00416\ \ \ \ \ \textcolor{comment}{//\ data\ area\ of\ this\ QR\ Code.\ Function\ modules\ need\ to\ be\ marked\ off\ before\ this\ is\ called.}}
+\DoxyCodeLine{00417\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ drawCodewords(\textcolor{keyword}{const}\ std::vector<std::uint8\_t>\ \&data);}
+\DoxyCodeLine{00418\ \ \ \ \ }
+\DoxyCodeLine{00419\ \ \ \ \ }
+\DoxyCodeLine{00420\ \ \ \ \ \textcolor{comment}{//\ XORs\ the\ codeword\ modules\ in\ this\ QR\ Code\ with\ the\ given\ mask\ pattern.}}
+\DoxyCodeLine{00421\ \ \ \ \ \textcolor{comment}{//\ The\ function\ modules\ must\ be\ marked\ and\ the\ codeword\ bits\ must\ be\ drawn}}
+\DoxyCodeLine{00422\ \ \ \ \ \textcolor{comment}{//\ before\ masking.\ Due\ to\ the\ arithmetic\ of\ XOR,\ calling\ applyMask()\ with}}
+\DoxyCodeLine{00423\ \ \ \ \ \textcolor{comment}{//\ the\ same\ mask\ value\ a\ second\ time\ will\ undo\ the\ mask.\ A\ final\ well-\/formed}}
+\DoxyCodeLine{00424\ \ \ \ \ \textcolor{comment}{//\ QR\ Code\ needs\ exactly\ one\ (not\ zero,\ two,\ etc.)\ mask\ applied.}}
+\DoxyCodeLine{00425\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ applyMask(\textcolor{keywordtype}{int}\ msk);}
+\DoxyCodeLine{00426\ \ \ \ \ }
+\DoxyCodeLine{00427\ \ \ \ \ }
+\DoxyCodeLine{00428\ \ \ \ \ \textcolor{comment}{//\ Calculates\ and\ returns\ the\ penalty\ score\ based\ on\ state\ of\ this\ QR\ Code's\ current\ modules.}}
+\DoxyCodeLine{00429\ \ \ \ \ \textcolor{comment}{//\ This\ is\ used\ by\ the\ automatic\ mask\ choice\ algorithm\ to\ find\ the\ mask\ pattern\ that\ yields\ the\ lowest\ score.}}
+\DoxyCodeLine{00430\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{long}\ getPenaltyScore()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00431\ \ \ \ \ }
+\DoxyCodeLine{00432\ \ \ \ \ }
+\DoxyCodeLine{00433\ \ \ \ \ }
+\DoxyCodeLine{00434\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Private\ helper\ functions\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00435\ \ \ \ \ }
+\DoxyCodeLine{00436\ \ \ \ \ \textcolor{comment}{//\ Returns\ an\ ascending\ list\ of\ positions\ of\ alignment\ patterns\ for\ this\ version\ number.}}
+\DoxyCodeLine{00437\ \ \ \ \ \textcolor{comment}{//\ Each\ position\ is\ in\ the\ range\ [0,177),\ and\ are\ used\ on\ both\ the\ x\ and\ y\ axes.}}
+\DoxyCodeLine{00438\ \ \ \ \ \textcolor{comment}{//\ This\ could\ be\ implemented\ as\ lookup\ table\ of\ 40\ variable-\/length\ lists\ of\ unsigned\ bytes.}}
+\DoxyCodeLine{00439\ \ \ \ \ \textcolor{keyword}{private}:\ std::vector<int>\ getAlignmentPatternPositions()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00440\ \ \ \ \ }
+\DoxyCodeLine{00441\ \ \ \ \ }
+\DoxyCodeLine{00442\ \ \ \ \ \textcolor{comment}{//\ Returns\ the\ number\ of\ data\ bits\ that\ can\ be\ stored\ in\ a\ QR\ Code\ of\ the\ given\ version\ number,\ after}}
+\DoxyCodeLine{00443\ \ \ \ \ \textcolor{comment}{//\ all\ function\ modules\ are\ excluded.\ This\ includes\ remainder\ bits,\ so\ it\ might\ not\ be\ a\ multiple\ of\ 8.}}
+\DoxyCodeLine{00444\ \ \ \ \ \textcolor{comment}{//\ The\ result\ is\ in\ the\ range\ [208,\ 29648].\ This\ could\ be\ implemented\ as\ a\ 40-\/entry\ lookup\ table.}}
+\DoxyCodeLine{00445\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ getNumRawDataModules(\textcolor{keywordtype}{int}\ ver);}
+\DoxyCodeLine{00446\ \ \ \ \ }
+\DoxyCodeLine{00447\ \ \ \ \ }
+\DoxyCodeLine{00448\ \ \ \ \ \textcolor{comment}{//\ Returns\ the\ number\ of\ 8-\/bit\ data\ (i.e.\ not\ error\ correction)\ codewords\ contained\ in\ any}}
+\DoxyCodeLine{00449\ \ \ \ \ \textcolor{comment}{//\ QR\ Code\ of\ the\ given\ version\ number\ and\ error\ correction\ level,\ with\ remainder\ bits\ discarded.}}
+\DoxyCodeLine{00450\ \ \ \ \ \textcolor{comment}{//\ This\ stateless\ pure\ function\ could\ be\ implemented\ as\ a\ (40*4)-\/cell\ lookup\ table.}}
+\DoxyCodeLine{00451\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{int}\ getNumDataCodewords(\textcolor{keywordtype}{int}\ ver,\ Ecc\ ecl);}
+\DoxyCodeLine{00452\ \ \ \ \ }
+\DoxyCodeLine{00453\ \ \ \ \ }
+\DoxyCodeLine{00454\ \ \ \ \ \textcolor{comment}{//\ Returns\ a\ Reed-\/Solomon\ ECC\ generator\ polynomial\ for\ the\ given\ degree.\ This\ could\ be}}
+\DoxyCodeLine{00455\ \ \ \ \ \textcolor{comment}{//\ implemented\ as\ a\ lookup\ table\ over\ all\ possible\ parameter\ values,\ instead\ of\ as\ an\ algorithm.}}
+\DoxyCodeLine{00456\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ std::vector<std::uint8\_t>\ reedSolomonComputeDivisor(\textcolor{keywordtype}{int}\ degree);}
+\DoxyCodeLine{00457\ \ \ \ \ }
+\DoxyCodeLine{00458\ \ \ \ \ }
+\DoxyCodeLine{00459\ \ \ \ \ \textcolor{comment}{//\ Returns\ the\ Reed-\/Solomon\ error\ correction\ codeword\ for\ the\ given\ data\ and\ divisor\ polynomials.}}
+\DoxyCodeLine{00460\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ std::vector<std::uint8\_t>\ reedSolomonComputeRemainder(\textcolor{keyword}{const}\ std::vector<std::uint8\_t>\ \&data,\ \textcolor{keyword}{const}\ std::vector<std::uint8\_t>\ \&divisor);}
+\DoxyCodeLine{00461\ \ \ \ \ }
+\DoxyCodeLine{00462\ \ \ \ \ }
+\DoxyCodeLine{00463\ \ \ \ \ \textcolor{comment}{//\ Returns\ the\ product\ of\ the\ two\ given\ field\ elements\ modulo\ GF(2\string^8/0x11D).}}
+\DoxyCodeLine{00464\ \ \ \ \ \textcolor{comment}{//\ All\ inputs\ are\ valid.\ This\ could\ be\ implemented\ as\ a\ 256*256\ lookup\ table.}}
+\DoxyCodeLine{00465\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ std::uint8\_t\ reedSolomonMultiply(std::uint8\_t\ x,\ std::uint8\_t\ y);}
+\DoxyCodeLine{00466\ \ \ \ \ }
+\DoxyCodeLine{00467\ \ \ \ \ }
+\DoxyCodeLine{00468\ \ \ \ \ \textcolor{comment}{//\ Can\ only\ be\ called\ immediately\ after\ a\ light\ run\ is\ added,\ and}}
+\DoxyCodeLine{00469\ \ \ \ \ \textcolor{comment}{//\ returns\ either\ 0,\ 1,\ or\ 2.\ A\ helper\ function\ for\ getPenaltyScore().}}
+\DoxyCodeLine{00470\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ finderPenaltyCountPatterns(\textcolor{keyword}{const}\ std::array<int,7>\ \&runHistory)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00471\ \ \ \ \ }
+\DoxyCodeLine{00472\ \ \ \ \ }
+\DoxyCodeLine{00473\ \ \ \ \ \textcolor{comment}{//\ Must\ be\ called\ at\ the\ end\ of\ a\ line\ (row\ or\ column)\ of\ modules.\ A\ helper\ function\ for\ getPenaltyScore().}}
+\DoxyCodeLine{00474\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{int}\ finderPenaltyTerminateAndCount(\textcolor{keywordtype}{bool}\ currentRunColor,\ \textcolor{keywordtype}{int}\ currentRunLength,\ std::array<int,7>\ \&runHistory)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00475\ \ \ \ \ }
+\DoxyCodeLine{00476\ \ \ \ \ }
+\DoxyCodeLine{00477\ \ \ \ \ \textcolor{comment}{//\ Pushes\ the\ given\ value\ to\ the\ front\ and\ drops\ the\ last\ value.\ A\ helper\ function\ for\ getPenaltyScore().}}
+\DoxyCodeLine{00478\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keywordtype}{void}\ finderPenaltyAddHistory(\textcolor{keywordtype}{int}\ currentRunLength,\ std::array<int,7>\ \&runHistory)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00479\ \ \ \ \ }
+\DoxyCodeLine{00480\ \ \ \ \ }
+\DoxyCodeLine{00481\ \ \ \ \ \textcolor{comment}{//\ Returns\ true\ iff\ the\ i'th\ bit\ of\ x\ is\ set\ to\ 1.}}
+\DoxyCodeLine{00482\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keywordtype}{bool}\ getBit(\textcolor{keywordtype}{long}\ x,\ \textcolor{keywordtype}{int}\ i);}
+\DoxyCodeLine{00483\ \ \ \ \ }
+\DoxyCodeLine{00484\ \ \ \ \ }
+\DoxyCodeLine{00485\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Constants\ and\ tables\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00486\ \ \ \ \ }
+\DoxyCodeLine{00487\ \ \ \ \ \textcolor{comment}{//\ The\ minimum\ version\ number\ supported\ in\ the\ QR\ Code\ Model\ 2\ standard.}}
+\DoxyCodeLine{00488\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ MIN\_VERSION\ =\ \ 1;}
+\DoxyCodeLine{00489\ \ \ \ \ }
+\DoxyCodeLine{00490\ \ \ \ \ \textcolor{comment}{//\ The\ maximum\ version\ number\ supported\ in\ the\ QR\ Code\ Model\ 2\ standard.}}
+\DoxyCodeLine{00491\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{constexpr}\ \textcolor{keywordtype}{int}\ MAX\_VERSION\ =\ 40;}
+\DoxyCodeLine{00492\ \ \ \ \ }
+\DoxyCodeLine{00493\ \ \ \ \ }
+\DoxyCodeLine{00494\ \ \ \ \ \textcolor{comment}{//\ For\ use\ in\ getPenaltyScore(),\ when\ evaluating\ which\ mask\ is\ best.}}
+\DoxyCodeLine{00495\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PENALTY\_N1;}
+\DoxyCodeLine{00496\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PENALTY\_N2;}
+\DoxyCodeLine{00497\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PENALTY\_N3;}
+\DoxyCodeLine{00498\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ PENALTY\_N4;}
+\DoxyCodeLine{00499\ \ \ \ \ }
+\DoxyCodeLine{00500\ \ \ \ \ }
+\DoxyCodeLine{00501\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::int8\_t\ ECC\_CODEWORDS\_PER\_BLOCK[4][41];}
+\DoxyCodeLine{00502\ \ \ \ \ \textcolor{keyword}{private}:\ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::int8\_t\ NUM\_ERROR\_CORRECTION\_BLOCKS[4][41];}
+\DoxyCodeLine{00503\ \ \ \ \ }
+\DoxyCodeLine{00504\ \};}
+\DoxyCodeLine{00505\ }
+\DoxyCodeLine{00506\ }
+\DoxyCodeLine{00507\ }
+\DoxyCodeLine{00508\ \textcolor{comment}{/*-\/-\/-\/-\/\ Public\ exception\ class\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00509\ }
+\DoxyCodeLine{00510\ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00511\ \textcolor{comment}{\ *\ Thrown\ when\ the\ supplied\ data\ does\ not\ fit\ any\ QR\ Code\ version.\ Ways\ to\ handle\ this\ exception\ include:}}
+\DoxyCodeLine{00512\ \textcolor{comment}{\ *\ -\/\ Decrease\ the\ error\ correction\ level\ if\ it\ was\ greater\ than\ Ecc::LOW.}}
+\DoxyCodeLine{00513\ \textcolor{comment}{\ *\ -\/\ If\ the\ encodeSegments()\ function\ was\ called\ with\ a\ maxVersion\ argument,\ then\ increase}}
+\DoxyCodeLine{00514\ \textcolor{comment}{\ *\ \ \ it\ if\ it\ was\ less\ than\ QrCode::MAX\_VERSION.\ (This\ advice\ does\ not\ apply\ to\ the\ other}}
+\DoxyCodeLine{00515\ \textcolor{comment}{\ *\ \ \ factory\ functions\ because\ they\ search\ all\ versions\ up\ to\ QrCode::MAX\_VERSION.)}}
+\DoxyCodeLine{00516\ \textcolor{comment}{\ *\ -\/\ Split\ the\ text\ data\ into\ better\ or\ optimal\ segments\ in\ order\ to\ reduce\ the\ number\ of\ bits\ required.}}
+\DoxyCodeLine{00517\ \textcolor{comment}{\ *\ -\/\ Change\ the\ text\ or\ binary\ data\ to\ be\ shorter.}}
+\DoxyCodeLine{00518\ \textcolor{comment}{\ *\ -\/\ Change\ the\ text\ to\ fit\ the\ character\ set\ of\ a\ particular\ segment\ mode\ (e.g.\ alphanumeric).}}
+\DoxyCodeLine{00519\ \textcolor{comment}{\ *\ -\/\ Propagate\ the\ error\ upward\ to\ the\ caller/user.}}
+\DoxyCodeLine{00520\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00521\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classqrcodegen_1_1data__too__long}{data\_too\_long}}\ :\ \textcolor{keyword}{public}\ std::length\_error\ \{}
+\DoxyCodeLine{00522\ \ \ \ \ }
+\DoxyCodeLine{00523\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keyword}{explicit}\ \mbox{\hyperlink{classqrcodegen_1_1data__too__long}{data\_too\_long}}(\textcolor{keyword}{const}\ std::string\ \&msg);}
+\DoxyCodeLine{00524\ \ \ \ \ }
+\DoxyCodeLine{00525\ \};}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ }
+\DoxyCodeLine{00528\ }
+\DoxyCodeLine{00529\ \textcolor{comment}{/*\ }}
+\DoxyCodeLine{00530\ \textcolor{comment}{\ *\ An\ appendable\ sequence\ of\ bits\ (0s\ and\ 1s).\ Mainly\ used\ by\ QrSegment.}}
+\DoxyCodeLine{00531\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00532\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classqrcodegen_1_1_bit_buffer}{BitBuffer}}\ final\ :\ \textcolor{keyword}{public}\ std::vector<bool>\ \{}
+\DoxyCodeLine{00533\ \ \ \ \ }
+\DoxyCodeLine{00534\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Constructor\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00535\ \ \ \ \ }
+\DoxyCodeLine{00536\ \ \ \ \ \textcolor{comment}{//\ Creates\ an\ empty\ bit\ buffer\ (length\ 0).}}
+\DoxyCodeLine{00537\ \ \ \ \ \textcolor{keyword}{public}:\ \mbox{\hyperlink{classqrcodegen_1_1_bit_buffer}{BitBuffer}}();}
+\DoxyCodeLine{00538\ \ \ \ \ }
+\DoxyCodeLine{00539\ \ \ \ \ }
+\DoxyCodeLine{00540\ \ \ \ \ }
+\DoxyCodeLine{00541\ \ \ \ \ \textcolor{comment}{/*-\/-\/-\/-\/\ Method\ -\/-\/-\/-\/*/}}
+\DoxyCodeLine{00542\ \ \ \ \ }
+\DoxyCodeLine{00543\ \ \ \ \ \textcolor{comment}{//\ Appends\ the\ given\ number\ of\ low-\/order\ bits\ of\ the\ given\ value}}
+\DoxyCodeLine{00544\ \ \ \ \ \textcolor{comment}{//\ to\ this\ buffer.\ Requires\ 0\ <=\ len\ <=\ 31\ and\ val\ <\ 2\string^len.}}
+\DoxyCodeLine{00545\ \ \ \ \ \textcolor{keyword}{public}:\ \textcolor{keywordtype}{void}\ appendBits(std::uint32\_t\ val,\ \textcolor{keywordtype}{int}\ len);}
+\DoxyCodeLine{00546\ \ \ \ \ }
+\DoxyCodeLine{00547\ \};}
+\DoxyCodeLine{00548\ }
+\DoxyCodeLine{00549\ \}}
+
+\end{DoxyCode}

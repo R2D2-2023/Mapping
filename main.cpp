@@ -40,6 +40,7 @@ using namespace qrcodegen;
  *   Software.
  */
 
+
 // Function prototypes
 static void makeQR(const char *Text);
 static std::string toSvgString(const QrCode &qr, int border);
@@ -48,6 +49,13 @@ static void printQr(const QrCode &qr);
 
 /*---- Demo suite ----*/
 
+/**
+ * 
+ * @file main.cpp
+ * @brief for creating the qr-code
+ * 
+ * @param Text 
+ */
 // Creates a single QR Code, then prints it to the console.
 static void makeQR(const char *Text) {
 	const char *text = Text;              // User-supplied text
@@ -77,6 +85,13 @@ static void makeQR(const char *Text) {
 
 /*---- Utilities ----*/
 
+/**
+ * @brief for taken a encoded string and making it a QR-code
+ * 
+ * @param qr 
+ * @param border 
+ * @return std::string 
+ */
 // Returns a string of SVG code for an image depicting the given QR Code, with the given number
 // of border modules. The string always uses Unix newlines (\n), regardless of the platform.
 static std::string toSvgString(const QrCode &qr, int border) {

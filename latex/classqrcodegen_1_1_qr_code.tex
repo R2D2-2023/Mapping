@@ -1,0 +1,60 @@
+\hypertarget{classqrcodegen_1_1_qr_code}{}\doxysection{qrcodegen\+::Qr\+Code Class Reference}
+\label{classqrcodegen_1_1_qr_code}\index{qrcodegen::QrCode@{qrcodegen::QrCode}}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a9ac15e987cf5cb71b1662373e6c9fec0}\label{classqrcodegen_1_1_qr_code_a9ac15e987cf5cb71b1662373e6c9fec0}} 
+enum class {\bfseries Ecc} \{ {\bfseries LOW} = 0
+, {\bfseries MEDIUM}
+, {\bfseries QUARTILE}
+, {\bfseries HIGH}
+ \}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a566e993f52899733fed8017bf8869b2b}\label{classqrcodegen_1_1_qr_code_a566e993f52899733fed8017bf8869b2b}} 
+{\bfseries Qr\+Code} (int ver, Ecc ecl, const std\+::vector$<$ std\+::uint8\+\_\+t $>$ \&data\+Codewords, int msk)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a2f473df995c683a0f3e63a6d83b6b2cb}\label{classqrcodegen_1_1_qr_code_a2f473df995c683a0f3e63a6d83b6b2cb}} 
+int {\bfseries get\+Version} () const
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a1fd72bbd390acc49362eddcfdf93b42b}\label{classqrcodegen_1_1_qr_code_a1fd72bbd390acc49362eddcfdf93b42b}} 
+int {\bfseries get\+Size} () const
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a158bfeb79b33f0f7c7325d60a50f5404}\label{classqrcodegen_1_1_qr_code_a158bfeb79b33f0f7c7325d60a50f5404}} 
+Ecc {\bfseries get\+Error\+Correction\+Level} () const
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a69de407dc25aa12a5c67d1fb9d0a6d8f}\label{classqrcodegen_1_1_qr_code_a69de407dc25aa12a5c67d1fb9d0a6d8f}} 
+int {\bfseries get\+Mask} () const
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a729c17d33f13d21fb8295c04ef465133}\label{classqrcodegen_1_1_qr_code_a729c17d33f13d21fb8295c04ef465133}} 
+bool {\bfseries get\+Module} (int x, int y) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a15d9e26d273b8de6d0773e317ebd97d5}\label{classqrcodegen_1_1_qr_code_a15d9e26d273b8de6d0773e317ebd97d5}} 
+static \mbox{\hyperlink{classqrcodegen_1_1_qr_code}{Qr\+Code}} {\bfseries encode\+Text} (const char $\ast$text, Ecc ecl)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a31efd868a933e2ea62a6f9694bf19606}\label{classqrcodegen_1_1_qr_code_a31efd868a933e2ea62a6f9694bf19606}} 
+static \mbox{\hyperlink{classqrcodegen_1_1_qr_code}{Qr\+Code}} {\bfseries encode\+Binary} (const std\+::vector$<$ std\+::uint8\+\_\+t $>$ \&data, Ecc ecl)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a78aa108015b15a8b1fd35d042aff34aa}\label{classqrcodegen_1_1_qr_code_a78aa108015b15a8b1fd35d042aff34aa}} 
+static \mbox{\hyperlink{classqrcodegen_1_1_qr_code}{Qr\+Code}} {\bfseries encode\+Segments} (const std\+::vector$<$ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{Qr\+Segment}} $>$ \&segs, Ecc ecl, int min\+Version=1, int max\+Version=40, int mask=-\/1, bool boost\+Ecl=true)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_a49443c1e43f8c73b6a5c6069c6b24bd4}\label{classqrcodegen_1_1_qr_code_a49443c1e43f8c73b6a5c6069c6b24bd4}} 
+static constexpr int {\bfseries MIN\+\_\+\+VERSION} = 1
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_code_ac884bc36ec4765b89540751ad8c7dfa1}\label{classqrcodegen_1_1_qr_code_ac884bc36ec4765b89540751ad8c7dfa1}} 
+static constexpr int {\bfseries MAX\+\_\+\+VERSION} = 40
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+qrcodegen.\+hpp\item 
+qrcodegen.\+cpp\end{DoxyCompactItemize}

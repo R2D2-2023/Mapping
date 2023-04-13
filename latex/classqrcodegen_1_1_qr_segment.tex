@@ -1,0 +1,58 @@
+\hypertarget{classqrcodegen_1_1_qr_segment}{}\doxysection{qrcodegen\+::Qr\+Segment Class Reference}
+\label{classqrcodegen_1_1_qr_segment}\index{qrcodegen::QrSegment@{qrcodegen::QrSegment}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_aac098af945f0037b853ac89600795e94}\label{classqrcodegen_1_1_qr_segment_aac098af945f0037b853ac89600795e94}} 
+{\bfseries Qr\+Segment} (const \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}} \&md, int num\+Ch, const std\+::vector$<$ bool $>$ \&dt)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_ad584cb1b2c19440f00adade362be5d23}\label{classqrcodegen_1_1_qr_segment_ad584cb1b2c19440f00adade362be5d23}} 
+{\bfseries Qr\+Segment} (const \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}} \&md, int num\+Ch, std\+::vector$<$ bool $>$ \&\&dt)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_ac4e4bffedf012d9953f6202b95fc424c}\label{classqrcodegen_1_1_qr_segment_ac4e4bffedf012d9953f6202b95fc424c}} 
+const \mbox{\hyperlink{classqrcodegen_1_1_qr_segment_1_1_mode}{Mode}} \& {\bfseries get\+Mode} () const
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_a5cfeb0667c8986782e76f013372b2de3}\label{classqrcodegen_1_1_qr_segment_a5cfeb0667c8986782e76f013372b2de3}} 
+int {\bfseries get\+Num\+Chars} () const
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_ac805cd86c99c0871fd16e5d49fc4517a}\label{classqrcodegen_1_1_qr_segment_ac805cd86c99c0871fd16e5d49fc4517a}} 
+const std\+::vector$<$ bool $>$ \& {\bfseries get\+Data} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_a32ead40ba58149f5e5fe13a6417d8304}\label{classqrcodegen_1_1_qr_segment_a32ead40ba58149f5e5fe13a6417d8304}} 
+static \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{Qr\+Segment}} {\bfseries make\+Bytes} (const std\+::vector$<$ std\+::uint8\+\_\+t $>$ \&data)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_a03484cb17296745b303f0bd48b213446}\label{classqrcodegen_1_1_qr_segment_a03484cb17296745b303f0bd48b213446}} 
+static \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{Qr\+Segment}} {\bfseries make\+Numeric} (const char $\ast$digits)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_ae2d00f78a60165d70faf5b56e36ae511}\label{classqrcodegen_1_1_qr_segment_ae2d00f78a60165d70faf5b56e36ae511}} 
+static \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{Qr\+Segment}} {\bfseries make\+Alphanumeric} (const char $\ast$text)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_aa587c9cfcb4b28552d5d1e4c05b5b962}\label{classqrcodegen_1_1_qr_segment_aa587c9cfcb4b28552d5d1e4c05b5b962}} 
+static std\+::vector$<$ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{Qr\+Segment}} $>$ {\bfseries make\+Segments} (const char $\ast$text)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_a2cb028d26ef5d9d970b344eee0b98de7}\label{classqrcodegen_1_1_qr_segment_a2cb028d26ef5d9d970b344eee0b98de7}} 
+static \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{Qr\+Segment}} {\bfseries make\+Eci} (long assign\+Val)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_a9f2c32b351c0731c08fb170c2320f04d}\label{classqrcodegen_1_1_qr_segment_a9f2c32b351c0731c08fb170c2320f04d}} 
+static bool {\bfseries is\+Numeric} (const char $\ast$text)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_a28153ac814d7b3105473a33d6e6734f3}\label{classqrcodegen_1_1_qr_segment_a28153ac814d7b3105473a33d6e6734f3}} 
+static bool {\bfseries is\+Alphanumeric} (const char $\ast$text)
+\item 
+\mbox{\Hypertarget{classqrcodegen_1_1_qr_segment_ad03817114a3ea5237b79805692db285e}\label{classqrcodegen_1_1_qr_segment_ad03817114a3ea5237b79805692db285e}} 
+static int {\bfseries get\+Total\+Bits} (const std\+::vector$<$ \mbox{\hyperlink{classqrcodegen_1_1_qr_segment}{Qr\+Segment}} $>$ \&segs, int version)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+qrcodegen.\+hpp\item 
+qrcodegen.\+cpp\end{DoxyCompactItemize}
