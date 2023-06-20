@@ -7,7 +7,6 @@
 #include <opencv2/ml.hpp>
 #include <cstdlib>
 #include <string>
-#include <Windows.h>
 
 /**
  * @brief for data that the mouse needs
@@ -17,15 +16,26 @@ struct MouseData {
     std::vector<std::vector<int>>* matrix;
     int cell_size;
     cv::Mat* img;
+    cv::Mat* origImg;
+    int counter = 0;
+    int checkpoint_counter = -5;
+    std::vector<std::pair<int, int>> route;
+    int robotX = 10;
+    int robotY = 10;
+    int mode = 0;
 };
 
 struct GridData {
-    int beginX;
-    int beginY;
-    int endX;
-    int endY;
+    int beginX = 0;
+    int beginY = 0;
+    int endX = 0;
+    int endY = 0;
 };
-int counter = 1;
+
+struct storeData {
+    GridData gData;
+    MouseData MData;
+};
 
 
 /**
@@ -35,74 +45,62 @@ int counter = 1;
  * @param cell_size 
  * @param matrix 
  */
-void UpdateGridImage(cv::Mat& img, int cell_size, std::vector<std::vector<int>>& matrix) {
+void UpdateGridImage(int cell_size, std::vector<std::vector<int>>& matrix, storeData* data) {
     cv::Scalar grid_color = cv::Scalar(0, 0, 255);
     cv::Scalar grid_color_green = cv::Scalar(0, 255, 0);
-    cv::Mat grid_img = img.clone();
+    cv::Scalar grid_color_checkpoint1 = cv::Scalar(255, 0, 255);
+    cv::Mat grid_img = *data->MData.origImg;
+    std::cout << data->gData.beginX << " , " << data->gData.beginY << std::endl;
     for (int i = 0; i < matrix.size(); i++){
-        int y = i * cell_size;
+        int y = data->gData.beginY + i * cell_size;
         for (int j = 0; j < matrix.at(0).size(); j++){
-            int x = j * cell_size;
-            
+            int x = data->gData.beginX + j * cell_size;
             if(matrix[i][j] == 0){
                 cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color, 1);
-                
-            }else if(matrix[i][j] == 10){
-                cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), cv::Scalar(255, 0, 0), -1);
+            }
+            else if(matrix[i][j] == 9999){
+                cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), cv::Scalar(100, 100, 100), -1);
+            }
+            else if(matrix[i][j] < 0){
+                cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color_checkpoint1, -1);
             }
             else{
                 cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color_green, -1);
             }
         }
     }
-
     cv::imshow("Grid Image", grid_img);
 }
 
-int CheckSurroundings(std::vector<std::vector<int>>* matrix){
-    int markerX = 20;
-    int markerY = 20;
-    int highest_number = -1;
-    int nextXcoordinate = 0;
-    int nextYcoordinate = 0;
-    if(matrix->at(markerX).at(markerY) == 555){
-    // Check the surrounding blocks
-    for (int y = markerY - 1; y <= markerY + 1; ++y) {
-        for (int x = markerX - 1; x <= markerX + 1; ++x) {
-            // Skip if the current position is out of bounds
+int CheckSurroundings(storeData* data){
+    bool next_found = false;
+    for(int y = data->MData.robotY -1; y <= data->MData.robotY + 1; ++y){
+        for(int x = data->MData.robotX - 1; x <= data->MData.robotX + 1; ++x){
             if (x < 0 || x >= 173 || y < 0 || y >= 491) {
                 continue;
-            }
-
-            // Check the value at the current position
-            int value = matrix->at(x).at(y);
-
-            // Perform actions based on the value
-            if (value == 0) {
-                continue;
-            } else if (value != 555) {
-                if(highest_number < value){
-                    highest_number = value;
-                    nextXcoordinate = y;
-                    nextYcoordinate = x;
-
+            } // out of bounds check
+            if(data->MData.route.size() <= data->MData.counter){
+                return 0; // error voorkomen
+            }else if(x == data->MData.route[data->MData.counter].first && y == data->MData.route[data->MData.counter].second){
+                int value = data->MData.matrix->at(x).at(y);
+                data->MData.counter++;
+                std::cout << "COORDINATE FOUND" << std::endl;
+                if(value < 0){
+                    std::cout << "CHECKPOINT FOUND, CHECKPOINT FUNCTIE UITVOEREN" << std::endl;
                 }
-                // std::cout << "Block at (" << x << ", " << y << ") contains a marker with the value: " << value << std::endl;
+                if(!(data->MData.route.size() > data->MData.counter)){
+                    std::cout << "RESET" <<std::endl;
+                    data->MData.counter = 0;
+                }
+                std::cout << "Next coordinate:" << data->MData.route[data->MData.counter].first << "/" << data->MData.route[data->MData.counter].second << std::endl;
+                return 0;
             }
         }
     }
-    }
     
-    if(highest_number != -1){
-        std::cout << "The highest number is: " << highest_number << " at the coordinates x/y: " << nextXcoordinate << "/" << nextYcoordinate << std::endl;
-    }
     return 0;
 }
 
-bool IsKeyPressed(int key)
-{
-    return (GetAsyncKeyState(key) & 0x8000) != 0;
-}
 
 /**
  * @brief For mouse movement and events
@@ -114,30 +112,65 @@ bool IsKeyPressed(int key)
  * @param user_data 
  */
 void OnMouse(int event, int x, int y, int flags, void* user_data) {
-    MouseData* data = (MouseData*)user_data;
-    int cell_size = data->cell_size;
-    std::vector<std::vector<int>>* matrix = data->matrix;
-    int j = x / cell_size;
-    int i = y / cell_size;
-    if(event == cv::EVENT_MOUSEMOVE && (flags & cv::EVENT_FLAG_LBUTTON)){
+    storeData* data = (storeData*)user_data;
+    int cell_size = data->MData.cell_size;
+    std::vector<std::vector<int>>* matrix = data->MData.matrix;
+    
+    int j = (x - data->gData.beginX) / cell_size;
+    int i = (y - data->gData.beginY) / cell_size;
+    
+    if (event == cv::EVENT_MOUSEMOVE) {
         if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
-            if(matrix->at(i).at(j) == 0){
-                counter++;
-                matrix->at(i).at(j) = counter;
-                std::cout << j << "/" << i << ": " << counter << std::endl;
-                
-                if(counter == 20){
-                    matrix->at(20).at(20) = 555;
+            if(data->MData.mode == 0){
+                if (flags & cv::EVENT_FLAG_LBUTTON) {
+                    if (matrix->at(i).at(j) == 0 && matrix->at(i).at(j) != 1) {
+                        // data->MData.counter++;
+                        matrix->at(i).at(j) = data->MData.counter;
+                        data->MData.route.push_back(std::make_pair(i, j));
+                        std::cout << j << "/" << i << ": " << data->MData.counter << std::endl;
+                        std::cout << "route: ";
+                        for(int routeDoornemer = 0; routeDoornemer < data->MData.route.size(); routeDoornemer++){
+                            std::cout << data->MData.route[routeDoornemer].first << "/" << data->MData.route[routeDoornemer].second << ",";
+                        }
+                        std::cout << std::endl;
+                        UpdateGridImage(cell_size, *matrix, data);
+                    }
+                    // else if(matrix->at(i).at(j) != counter){
+                    //     checkpoint_counter--;
+                    //     matrix->at(i).at(j) = checkpoint_counter;
+                    //     std::cout << j << "/" << i << ": " << " Verandering into checkpoint" << std::endl;
+                    // }
+                } else if (flags & cv::EVENT_FLAG_RBUTTON) {
+                    matrix->at(i).at(j) = 0;
+                    UpdateGridImage(cell_size, *matrix, data);
                 }
-                UpdateGridImage(*data->img, cell_size, *matrix);
+                CheckSurroundings(data);
             }
-        CheckSurroundings(matrix);
+            else{
+                if (flags & cv::EVENT_FLAG_LBUTTON) {
+                    matrix->at(i).at(j) = 9999;
+                    data->MData.robotX = i;
+                    data->MData.robotY = j;
+                    UpdateGridImage(cell_size, *matrix, data);
+            
+                } else if (flags & cv::EVENT_FLAG_RBUTTON) {
+                    matrix->at(i).at(j) = 0;
+                    UpdateGridImage(cell_size, *matrix, data);
+                }
+                CheckSurroundings(data);
+            }
         }
-    } 
-    else if(event == cv::EVENT_MOUSEMOVE && (flags & cv::EVENT_FLAG_RBUTTON)){
-         if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
-            matrix->at(i).at(j) = 0;
-            UpdateGridImage(*data->img, cell_size, *matrix);
+    } else if (event == cv::EVENT_MOUSEWHEEL) {
+        if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
+            std::cout << data->MData.mode << std::endl;
+            if(data->MData.mode == 0){
+                std::cout << "mode: " << data->MData.mode << std::endl;
+                data->MData.mode = 1;
+            }
+            else{
+                std::cout << "mode: " << data->MData.mode << std::endl;
+                data->MData.mode = 0;
+            }
         }
     }
 }
@@ -150,46 +183,40 @@ void OnMouse(int event, int x, int y, int flags, void* user_data) {
  * @param matrix 
  * @return std::vector<std::vector<int>> 
  */
-std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Point begin, cv::Point end){
+std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Mat& origImg, cv::Point begin, cv::Point end){
     cv::namedWindow("Grid Image", cv::WINDOW_NORMAL);
+    cv::resizeWindow("Grid Image", img.cols, img.rows);
 
     int longest_dim = std::max(img.cols, img.rows);
     int cell_size = std::ceil((double)longest_dim / 120);
     // int size = std::ceil((double)longest_dim / cell_size);
 
-    GridData gData;
-    gData.beginX = begin.x;
-    gData.beginY = begin.y;
-    gData.endX = end.x;
-    gData.endY = end.y; 
+    storeData uData;
+    uData.gData.beginX = begin.x;
+    uData.gData.beginY = begin.y;
+    uData.gData.endX = end.x;
+    uData.gData.endY = end.y;
 
-
-    // std::cout << begin.y << std::endl;
-    // std::cout << begin.x << std::endl;
-    // std::cout << begin.y << std::endl;
-    // std::cout << end.x << std::endl;
-    // std::cout << end.y << std::endl;
-    // std::cout << cell_size << std::endl;
-    // std::cout << (end.x - begin.x) << std::endl;
-    // std::cout << (end.y - begin.y) << std::endl;
-
+    // std::cout << begin.x <<  " , "  << begin.y << std::endl;
+    // std::cout << uData.gData.beginX <<  " , "  << uData.gData.beginY << std::endl;
 
     cv::Rect roi(begin.x, begin.y, end.x - begin.x, end.y - begin.y);
     cv::Mat roiImage = img(roi);
 
-    int longest_dim_roi = std::max(roiImage.cols, roiImage.rows);
-    int size = std::ceil((double)longest_dim_roi / cell_size);
+
+    int width = std::ceil((double)roiImage.cols / cell_size);
+    int height = std::ceil((double)roiImage.rows / cell_size);
 
 
-    std::vector<std::vector<int>> matrix( size , std::vector<int> (size, 0));
+    std::vector<std::vector<int>> matrix(height, std::vector<int>(width, 0));
 
-    MouseData data;
-    data.matrix = &matrix;
-    data.cell_size = cell_size;
-    data.img = &img;
+    uData.MData.matrix = &matrix;
+    uData.MData.cell_size = cell_size;
+    uData.MData.img = &img;
+    uData.MData.origImg = &origImg;
 
-    cv::setMouseCallback("Grid Image", OnMouse, &data);
-    UpdateGridImage(img, cell_size, matrix);
+    cv::setMouseCallback("Grid Image", OnMouse, &uData);
+    UpdateGridImage(cell_size, matrix, &uData);
 
     cv::waitKey(0);
 
@@ -198,7 +225,7 @@ std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Point begin, cv:
 
 
 int main(){
-    cv::Mat img = cv::imread("image.png", cv::IMREAD_COLOR);
+    cv::Mat img = cv::imread("floor4.png", cv::IMREAD_COLOR);
     if (img.empty()){
         std::cout << "Could not read the image" << std::endl;
         return -1;
@@ -207,21 +234,26 @@ int main(){
     cv::Mat hsv_img; 
     cv::cvtColor(img, hsv_img, cv::COLOR_BGR2HSV);
     // Define the lower and upper bounds of the green color range
-    cv::Scalar lowerGreen(30, 40, 40);
-    cv::Scalar upperGreen(90, 255, 255);
+    // cv::Scalar lower(30, 40, 40);
+    // cv::Scalar upper(90, 255, 255);
+
+    // black color
+    cv::Scalar lower(0, 0, 0);
+    cv::Scalar upper(180, 255, 30);
+
     // Create a mask to filter out non-green pixels
-    cv::Mat greenMask;
-    cv::inRange(hsv_img, lowerGreen, upperGreen, greenMask);
+    cv::Mat mask;
+    cv::inRange(hsv_img, lower, upper, mask);
     // Apply the mask to the original image
-    cv::Mat greenImg;
-    img.copyTo(greenImg, greenMask);
+    cv::Mat maskImg;
+    img.copyTo(maskImg, mask);
 
 
     // Find the coordinates of green pixels
     std::vector<cv::Point> greenCoords;
-    for (int y = 0; y < greenMask.rows; ++y) {
-        for (int x = 0; x < greenMask.cols; ++x) {
-            if (greenMask.at<uchar>(y, x) == 255) {
+    for (int y = 0; y < mask.rows; ++y) {
+        for (int x = 0; x < mask.cols; ++x) {
+            if (mask.at<uchar>(y, x) == 255) {
                 greenCoords.emplace_back(x, y);
             }
         }
@@ -269,140 +301,9 @@ int main(){
     //         }
     //     }
     // }
-    if (IsKeyPressed('z'))
-        {
-            std::cout << "Key Z is pressed" << std::endl;
-        }
+    
 
-    std::vector<std::vector<int>> matrix = CreateGridImage(greenImg, startPoint, endPoint);
+    std::vector<std::vector<int>> matrix = CreateGridImage(maskImg, img, startPoint, endPoint);
 
     return 0;
 }
-
-// /**
-//  * @brief for data that the mouse needs
-//  * 
-//  */
-// struct MouseData {
-//     std::vector<std::vector<int>>* matrix;
-//     int cell_size;
-//     cv::Mat* img;
-// };
-
-// /**
-//  * @brief for the grid making and updating
-//  * 
-//  * @param img 
-//  * @param cell_size 
-//  * @param matrix 
-//  */
-// void UpdateGridImage(cv::Mat& img, int cell_size, std::vector<std::vector<int>>& matrix) {
-//     cv::Scalar grid_color = cv::Scalar(0, 0, 255);
-//     cv::Scalar grid_color_green = cv::Scalar(0, 255, 0);
-//     cv::Mat grid_img = img.clone();
-//     for (int i = 0; i < matrix.size(); i++){
-//         int y = i * cell_size;
-//         for (int j = 0; j < matrix.at(0).size(); j++){
-//             int x = j * cell_size;
-//             if(matrix[i][j] == 1){
-//                 cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color_green, -1);
-//             }
-//             else{
-//                 cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color, 1);
-//             }
-//         }
-//     }
-
-//     cv::imshow("Grid Image", grid_img);
-// }
-
-// /**
-//  * @brief For mouse movement and events
-//  * 
-//  * @param event 
-//  * @param x 
-//  * @param y 
-//  * @param flags 
-//  * @param user_data 
-//  */
-// void OnMouse(int event, int x, int y, int flags, void* user_data) {
-//     MouseData* data = (MouseData*)user_data;
-//     int cell_size = data->cell_size;
-//     std::vector<std::vector<int>>* matrix = data->matrix;
-//     int j = x / cell_size;
-//     int i = y / cell_size;
-//     if(event == cv::EVENT_MOUSEMOVE && (flags & cv::EVENT_FLAG_LBUTTON)){
-//         if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
-//             matrix->at(i).at(j) = 1;
-//             UpdateGridImage(*data->img, cell_size, *matrix);
-//         }
-//     } 
-//     else if(event == cv::EVENT_MOUSEMOVE && (flags & cv::EVENT_FLAG_RBUTTON)){
-//          if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
-//             matrix->at(i).at(j) = 0;
-//             UpdateGridImage(*data->img, cell_size, *matrix);
-//         }
-//     }
-// }
-
-// /**
-//  * @brief Create a Grid Image object
-//  * 
-//  * @param img 
-//  * @param cell_size 
-//  * @param matrix 
-//  * @return std::vector<std::vector<int>> 
-//  */
-// std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, int cell_size, std::vector<std::vector<int>> matrix){
-//     cv::namedWindow("Grid Image", cv::WINDOW_NORMAL);
-
-//     MouseData data;
-//     data.matrix = &matrix;
-//     data.cell_size = cell_size;
-//     data.img = &img;
-
-//     cv::setMouseCallback("Grid Image", OnMouse, &data);
-//     UpdateGridImage(img, cell_size, matrix);
-
-//     cv::waitKey(0);
-
-//     return matrix;
-// }
-
-
-// int main(){
-//     // Load the image
-//     cv::Mat image = cv::imread("image.png");
-
-//     if (image.empty()) {
-//         std::cout << "Failed to load the image." << std::endl;
-//         return -1;
-//     }
-
-//     // Convert the image from BGR to HSV color space
-//     cv::Mat hsvImage;
-//     cv::cvtColor(image, hsvImage, cv::COLOR_BGR2HSV);
-
-//     // Define the lower and upper bounds for green in HSV color space
-//     cv::Scalar lowerGreen(40, 50, 50);    // Lower hue, saturation, and value thresholds for green
-//     cv::Scalar upperGreen(80, 255, 255);  // Upper hue, saturation, and value thresholds for green
-
-//     // Threshold the image to obtain only green pixels
-//     cv::Mat greenMask;
-//     cv::inRange(hsvImage, lowerGreen, upperGreen, greenMask);
-
-//     std::vector<cv::Point> greenPixelPositions;
-//     cv::findNonZero(greenMask, greenPixelPositions);
-
-//     // Print the pixel positions of the detected green pixels
-//     for (const cv::Point& position : greenPixelPositions) {
-//         std::cout << "Green pixel position: (" << positio   n.x << ", " << position.y << ")" << std::endl;
-//     }
-
-//     // Show the original image and the green mask
-//     cv::imshow("Original Image", image);
-//     cv::imshow("Green Mask", greenMask);
-//     cv::waitKey(0);
-
-//     return 0;
-// }
