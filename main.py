@@ -1,5 +1,6 @@
 import cv2
 import math
+import numpy as np
 from win32api import GetSystemMetrics
 
 class MouseData:
@@ -51,7 +52,6 @@ def update_grid_image(matrix, data):
                 else:
                     rect_color = grid_color_green
             cv2.rectangle(grid_img, (x, y), (x + cell_size, y + cell_size), rect_color, 1 if value == 0 else -1)
-
     cv2.imshow("Grid Image", grid_img)
 
 
@@ -96,7 +96,7 @@ def edit_image():
     imageAspectRatio = img.shape[1] / img.shape[0]
     maxWidth = screenWidth
     maxHeight = screenHeight
- 
+
     scaledWidth = maxWidth
     scaledHeight = int(scaledWidth / imageAspectRatio)
 
@@ -107,7 +107,6 @@ def edit_image():
     posX = (screenWidth - scaledWidth) // 2
     posY = (screenHeight - scaledHeight) // 2
 
-    cv2.namedWindow("Grid Image")
     cv2.moveWindow("Grid Image", posX, posY)
     img = cv2.resize(img, (scaledWidth, scaledHeight))
 
@@ -123,7 +122,7 @@ def OnMouse(event, x, y, flags, user_data):
     i = (y - data.gData.beginY) // cell_size
 
     if event == cv2.EVENT_MOUSEMOVE:
-        if 0 <= i < len(matrix) and 0 <= j < matrix_width:
+        if i >= 0 and i < len(matrix) and j >= 0 and j < matrix_width:
             current_cell = matrix[i][j]
             if data.MData.mode == 0:
                 if flags & cv2.EVENT_FLAG_LBUTTON:
@@ -141,99 +140,119 @@ def OnMouse(event, x, y, flags, user_data):
                 elif flags & cv2.EVENT_FLAG_RBUTTON:
                     if current_cell != 0:
                         is_in_route_or_meetpunten = False
-                        route_it = None
-                        meetpunten_it = None
-                        for index, coord in enumerate(data.MData.route):
-                            if coord == (i, j):
-                                route_it = index
-                                break
-                        for index, coord in enumerate(data.MData.meetPunten):
-                            if coord == (i, j):
-                                meetpunten_it = index
-                                break
+                        route_it = next((index for index, coord in enumerate(data.MData.route) if coord == (i, j)), None)
+                        meetpunten_it = next((index for index, coord in enumerate(data.MData.meetPunten) if coord == (i, j)), None)
                         if route_it is not None or meetpunten_it is not None:
                             is_in_route_or_meetpunten = True
                             if route_it is not None:
-                                del data.MData.route[route_it]
+                                data.MData.route.pop(route_it)
                             if meetpunten_it is not None:
-                                del data.MData.meetPunten[meetpunten_it]
+                                data.MData.meetPunten.pop(meetpunten_it)
                         if not is_in_route_or_meetpunten:
                             current_cell = 0
                             update_grid_image(matrix, data)
+                check_surroundings(data)
+            else:
+                if flags & cv2.EVENT_FLAG_LBUTTON:
+                    current_cell = 9999
+                    data.MData.robotX = i
+                    data.MData.robotY = j
+                    update_grid_image(matrix, data)
+                elif flags & cv2.EVENT_FLAG_RBUTTON:
+                    if current_cell == 0:
+                        data.MData.checkpoint_counter -= 1
+                        current_cell = data.MData.checkpoint_counter
+                        data.MData.meetPunten.append((i, j))
+                        print("meetPunten: ", end="")
+                        meetpunten_ss = ""
+                        for meetpunten_coord in data.MData.meetPunten:
+                            meetpunten_ss += f"{meetpunten_coord[0]}/{meetpunten_coord[1]},"
+                        print(meetpunten_ss)
+                        update_grid_image(matrix, data)
+                check_surroundings(data)
+    elif event == cv2.EVENT_MOUSEWHEEL:
+        if i >= 0 and i < len(matrix) and j >= 0 and j < matrix_width:
+            print(data.MData.mode)
+            data.MData.mode = 1 if data.MData.mode == 0 else 0
+            print(f"mode: {data.MData.mode}")
 
 
-
-def create_grid_image(img, orig_img, begin, end):
-    cv2.namedWindow("Grid Image")
+def create_grid_image(img, origImg, begin, end):
 
     longest_dim = max(img.shape[1], img.shape[0])
-    cell_size = math.ceil(longest_dim / 300)
+    cell_size = int(np.ceil(longest_dim / 300))
 
-    store_data = StoreData()
-    store_data.gData.beginX = begin[0]
-    store_data.gData.beginY = begin[1]
-    store_data.gData.endX = end[0]
-    store_data.gData.endY = end[1]
+    uData = StoreData()
+    uData.gData.beginX = begin[0]
+    uData.gData.beginY = begin[1]
+    uData.gData.endX = end[0]
+    uData.gData.endY = end[1]
 
     roi = (begin[0], begin[1], end[0] - begin[0], end[1] - begin[1])
-    roi_image = img[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
+    roiImage = img[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
 
-    width = math.ceil(roi_image.shape[1] / cell_size)
-    height = math.ceil(roi_image.shape[0] / cell_size)
+    width = int(np.ceil(roiImage.shape[1] / cell_size))
+    height = int(np.ceil(roiImage.shape[0] / cell_size))
 
-    matrix = [[0] * height for _ in range(width)]
-    store_data.MData.matrix = matrix
-    store_data.MData.cell_size = cell_size
-    store_data.MData.img = roi_image
-    store_data.MData.origImg = orig_img
+    matrix = [[0] * width for _ in range(height)]
 
-    cv2.setMouseCallback("Grid Image", OnMouse, store_data)
-    update_grid_image(matrix, store_data)
+    uData.MData.matrix = matrix
+    uData.MData.cell_size = cell_size
+    uData.MData.img = img
+    uData.MData.origImg = origImg
 
-    while True:
-        key = cv2.waitKey(1) & 0xFF
+    cv2.setMouseCallback("Grid Image", OnMouse, uData)
+    update_grid_image(matrix, uData)
 
-        if key == ord('q'):
-            break
+    cv2.waitKey(0)
 
-        elif key == ord('s'):
-            # Start de robotbeweging
-            while True:
-                result = check_surroundings(store_data)
-                if result == 0:
-                    break
-                elif result == -1:
-                    # Obstakel gevonden, stop de beweging
-                    print("Obstakel gevonden!")
-                    break
-                elif result == -2:
-                    # Checkpoint bereikt
-                    print("Checkpoint bereikt!")
-
-        elif key == ord('r'):
-            # Reset de robotpositie en tellers
-            store_data.MData.robotX = 10
-            store_data.MData.robotY = 10
-            store_data.MData.counter = 0
-            print("Robot positie gereset!")
-
-    cv2.destroyAllWindows()
+    return matrix
 
 
 def main():
-    img = cv2.imread("Toerk_map.png", cv2.IMREAD_COLOR)
-    if img is None:
-        print("Could not read the image")
-        return
+    cv2.namedWindow("Grid Image")  # Create the named window before calling edit_image()
+    img = edit_image()
 
-    screenWidth = GetSystemMetrics(0)
-    screenHeight = GetSystemMetrics(1)
-    begin = (20, 20)
-    end = (screenWidth - 20, screenHeight - 20)
+    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    orig_img = edit_image()
+    # Define the lower and upper bounds of the black color range
+    lower = np.array([0, 0, 0])
+    upper = np.array([180, 255, 30])
 
-    create_grid_image(img, orig_img, begin, end)
+    # Create a mask to filter out non-black pixels
+    mask = cv2.inRange(hsv_img, lower, upper)
+    
+    # Apply the mask to the original image
+    maskImg = cv2.bitwise_and(img, img, mask=mask)
+
+    # Find the coordinates of black pixels
+    coords = []
+    for y in range(mask.shape[0]):
+        for x in range(mask.shape[1]):
+            if mask[y, x] == 255:
+                coords.append((x, y))
+
+    # Find the highest, lowest, leftmost, and rightmost points
+    highestPoint = coords[0]
+    lowestPoint = coords[0]
+    leftmostPoint = coords[0]
+    rightmostPoint = coords[0]
+
+    for coord in coords:
+        if coord[1] < highestPoint[1]:
+            highestPoint = coord
+        if coord[1] > lowestPoint[1]:
+            lowestPoint = coord
+        if coord[0] < leftmostPoint[0]:
+            leftmostPoint = coord
+        if coord[0] > rightmostPoint[0]:
+            rightmostPoint = coord
+
+    startPoint = (leftmostPoint[0], highestPoint[1])  # Starting coordinate of the grid
+    endPoint = (rightmostPoint[0], lowestPoint[1])  # Ending coordinate of the grid
+
+    matrix = create_grid_image(maskImg, img, startPoint, endPoint)
+
 
 if __name__ == '__main__':
     main()
