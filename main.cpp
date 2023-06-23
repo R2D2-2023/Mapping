@@ -7,6 +7,7 @@
 #include <opencv2/ml.hpp>
 #include <cstdlib>
 #include <string>
+#include <windows.h>    
 
 /**
  * @brief for data that the mouse needs
@@ -20,6 +21,7 @@ struct MouseData {
     int counter = 0;
     int checkpoint_counter = -5;
     std::vector<std::pair<int, int>> route;
+    std::vector<std::pair<int, int>> meetPunten;
     int robotX = 10;
     int robotY = 10;
     int mode = 0;
@@ -45,38 +47,87 @@ struct storeData {
  * @param cell_size 
  * @param matrix 
  */
-void UpdateGridImage(int cell_size, std::vector<std::vector<int>>& matrix, storeData* data) {
+void UpdateGridImage(const std::vector<std::vector<int>>& matrix, storeData* data) {
     cv::Scalar grid_color = cv::Scalar(0, 0, 255);
     cv::Scalar grid_color_green = cv::Scalar(0, 255, 0);
-    cv::Scalar grid_color_checkpoint1 = cv::Scalar(255, 0, 255);
-    cv::Mat grid_img = *data->MData.origImg;
-    std::cout << data->gData.beginX << " , " << data->gData.beginY << std::endl;
-    for (int i = 0; i < matrix.size(); i++){
+    cv::Scalar grid_color_checkpoint = cv::Scalar(255, 0, 255);
+    cv::Mat grid_img = data->MData.origImg->clone();
+    int cell_size = data->MData.cell_size;
+
+    for (size_t i = 0; i < matrix.size(); i++) {
         int y = data->gData.beginY + i * cell_size;
-        for (int j = 0; j < matrix.at(0).size(); j++){
+        for (size_t j = 0; j < matrix[i].size(); j++) {
             int x = data->gData.beginX + j * cell_size;
-            if(matrix[i][j] == 0){
-                cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color, 1);
+            int value = matrix[i][j];
+            cv::Scalar rect_color;
+            switch (value) {
+                case 0:
+                    rect_color = grid_color;
+                    break;
+                case 9999:
+                    rect_color = cv::Scalar(100, 100, 100);
+                    break;
+                default:
+                    if (value < 0) {
+                        rect_color = grid_color_checkpoint;
+                    } else {
+                        rect_color = grid_color_green;
+                    }
+                    break;
             }
-            else if(matrix[i][j] == 9999){
-                cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), cv::Scalar(100, 100, 100), -1);
-            }
-            else if(matrix[i][j] < 0){
-                cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color_checkpoint1, -1);
-            }
-            else{
-                cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), grid_color_green, -1);
-            }
+            cv::rectangle(grid_img, cv::Point(x, y), cv::Point(x + cell_size, y + cell_size), rect_color, (value == 0) ? 1 : -1);
         }
     }
     cv::imshow("Grid Image", grid_img);
 }
 
+cv::Mat editImage(){
+    // Retrieve the screen resolution
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+    cv::Mat img = cv::imread("floor4.png", cv::IMREAD_COLOR);
+    if (img.empty()){
+        std::cout << "Could not read the image" << std::endl;
+    }
+
+    // Calculate the aspect ratio of the image
+    double imageAspectRatio = static_cast<double>(img.cols) / img.rows;
+
+    // Calculate the maximum width and height based on the screen resolution
+    int maxWidth = screenWidth;
+    int maxHeight = screenHeight;
+
+    // Calculate the scaled width and height while maintaining the aspect ratio
+    int scaledWidth = maxWidth;
+    int scaledHeight = static_cast<int>(scaledWidth / imageAspectRatio);
+
+    if (scaledHeight > maxHeight) {
+        scaledHeight = maxHeight;
+        scaledWidth = static_cast<int>(scaledHeight * imageAspectRatio);
+    }
+
+    // Calculate the position to center the image
+    int posX = (screenWidth - scaledWidth) / 2;
+    int posY = (screenHeight - scaledHeight) / 2;
+
+    // Create a window for displaying the image
+    // cv::namedWindow("Image", cv::WINDOW_NORMAL);
+    cv::moveWindow("Image", posX, posY);
+
+    // Resize the image
+    cv::resize(img, img, cv::Size(scaledWidth, scaledHeight));
+
+    return img;
+}
+
+
 int CheckSurroundings(storeData* data){
     bool next_found = false;
-    for(int y = data->MData.robotY -1; y <= data->MData.robotY + 1; ++y){
-        for(int x = data->MData.robotX - 1; x <= data->MData.robotX + 1; ++x){
-            if (x < 0 || x >= 173 || y < 0 || y >= 491) {
+    for(int y = data->MData.robotY; y <= data->MData.robotY; y++){
+        for(int x = data->MData.robotX; x <= data->MData.robotX; x++){
+            // std::cout << "x: " << x << " y: " << y << std::endl;
+            if (x < 0 || x >= 65 || y < 0 || y >= 232) {
                 continue;
             } // out of bounds check
             if(data->MData.route.size() <= data->MData.counter){
@@ -97,7 +148,6 @@ int CheckSurroundings(storeData* data){
             }
         }
     }
-    
     return 0;
 }
 
@@ -112,68 +162,85 @@ int CheckSurroundings(storeData* data){
  * @param user_data 
  */
 void OnMouse(int event, int x, int y, int flags, void* user_data) {
-    storeData* data = (storeData*)user_data;
+    storeData* data = static_cast<storeData*>(user_data);
     int cell_size = data->MData.cell_size;
-    std::vector<std::vector<int>>* matrix = data->MData.matrix;
-    
+    std::vector<std::vector<int>>& matrix = *(data->MData.matrix);
+    int matrix_width = matrix[0].size();
+
     int j = (x - data->gData.beginX) / cell_size;
     int i = (y - data->gData.beginY) / cell_size;
-    
+
     if (event == cv::EVENT_MOUSEMOVE) {
-        if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
-            if(data->MData.mode == 0){
+        if (i >= 0 && i < matrix.size() && j >= 0 && j < matrix_width) {
+            auto& current_cell = matrix[i][j];
+            if (data->MData.mode == 0) {
                 if (flags & cv::EVENT_FLAG_LBUTTON) {
-                    if (matrix->at(i).at(j) == 0 && matrix->at(i).at(j) != 1) {
-                        // data->MData.counter++;
-                        matrix->at(i).at(j) = data->MData.counter;
+                    if (current_cell == 0 && current_cell != 1) {
+                        data->MData.counter++;
+                        current_cell = data->MData.counter;
                         data->MData.route.push_back(std::make_pair(i, j));
                         std::cout << j << "/" << i << ": " << data->MData.counter << std::endl;
                         std::cout << "route: ";
-                        for(int routeDoornemer = 0; routeDoornemer < data->MData.route.size(); routeDoornemer++){
-                            std::cout << data->MData.route[routeDoornemer].first << "/" << data->MData.route[routeDoornemer].second << ",";
+                        std::stringstream route_ss;
+                        for (const auto& route_coord : data->MData.route) {
+                            route_ss << route_coord.first << "/" << route_coord.second << ",";
                         }
-                        std::cout << std::endl;
-                        UpdateGridImage(cell_size, *matrix, data);
+                        std::cout << route_ss.str() << std::endl;
+                        UpdateGridImage(matrix, data);
                     }
-                    // else if(matrix->at(i).at(j) != counter){
-                    //     checkpoint_counter--;
-                    //     matrix->at(i).at(j) = checkpoint_counter;
-                    //     std::cout << j << "/" << i << ": " << " Verandering into checkpoint" << std::endl;
-                    // }
                 } else if (flags & cv::EVENT_FLAG_RBUTTON) {
-                    matrix->at(i).at(j) = 0;
-                    UpdateGridImage(cell_size, *matrix, data);
+                    if (current_cell != 0) {
+                        bool is_in_route_or_meetpunten = false;
+                        auto route_it = std::find(data->MData.route.begin(), data->MData.route.end(), std::make_pair(i, j));
+                        auto meetpunten_it = std::find(data->MData.meetPunten.begin(), data->MData.meetPunten.end(), std::make_pair(i, j));
+                        if (route_it != data->MData.route.end() || meetpunten_it != data->MData.meetPunten.end()) {
+                            is_in_route_or_meetpunten = true;
+                            if (route_it != data->MData.route.end()) {
+                                data->MData.route.erase(route_it);
+                            }
+                            if (meetpunten_it != data->MData.meetPunten.end()) {
+                                data->MData.meetPunten.erase(meetpunten_it);
+                            }
+                        }
+                        if (!is_in_route_or_meetpunten) {
+                            current_cell = 0;
+                            UpdateGridImage(matrix, data);
+                        }
+                    }
                 }
                 CheckSurroundings(data);
-            }
-            else{
+            } else {
                 if (flags & cv::EVENT_FLAG_LBUTTON) {
-                    matrix->at(i).at(j) = 9999;
+                    current_cell = 9999;
                     data->MData.robotX = i;
                     data->MData.robotY = j;
-                    UpdateGridImage(cell_size, *matrix, data);
-            
+                    UpdateGridImage(matrix, data);
                 } else if (flags & cv::EVENT_FLAG_RBUTTON) {
-                    matrix->at(i).at(j) = 0;
-                    UpdateGridImage(cell_size, *matrix, data);
+                    if (current_cell == 0) {
+                        data->MData.checkpoint_counter--;
+                        current_cell = data->MData.checkpoint_counter;
+                        data->MData.meetPunten.push_back(std::make_pair(i, j));
+                        std::cout << "meetPunten: ";
+                        std::stringstream meetpunten_ss;
+                        for (const auto& meetpunten_coord : data->MData.meetPunten) {
+                            meetpunten_ss << meetpunten_coord.first << "/" << meetpunten_coord.second << ",";
+                        }
+                        std::cout << meetpunten_ss.str() << std::endl;
+                        UpdateGridImage(matrix, data);
+                    }
                 }
                 CheckSurroundings(data);
             }
         }
     } else if (event == cv::EVENT_MOUSEWHEEL) {
-        if (i >= 0 && i < matrix->size() && j >= 0 && j < matrix->at(0).size()) {
+        if (i >= 0 && i < matrix.size() && j >= 0 && j < matrix_width) {
             std::cout << data->MData.mode << std::endl;
-            if(data->MData.mode == 0){
-                std::cout << "mode: " << data->MData.mode << std::endl;
-                data->MData.mode = 1;
-            }
-            else{
-                std::cout << "mode: " << data->MData.mode << std::endl;
-                data->MData.mode = 0;
-            }
+            data->MData.mode = (data->MData.mode == 0) ? 1 : 0;
+            std::cout << "mode: " << data->MData.mode << std::endl;
         }
     }
 }
+
 
 /**
  * @brief Create a Grid Image object
@@ -184,12 +251,8 @@ void OnMouse(int event, int x, int y, int flags, void* user_data) {
  * @return std::vector<std::vector<int>> 
  */
 std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Mat& origImg, cv::Point begin, cv::Point end){
-    cv::namedWindow("Grid Image", cv::WINDOW_NORMAL);
-    cv::resizeWindow("Grid Image", img.cols, img.rows);
-
     int longest_dim = std::max(img.cols, img.rows);
-    int cell_size = std::ceil((double)longest_dim / 120);
-    // int size = std::ceil((double)longest_dim / cell_size);
+    int cell_size = std::ceil((double)longest_dim / 300);
 
     storeData uData;
     uData.gData.beginX = begin.x;
@@ -197,16 +260,11 @@ std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Mat& origImg, cv
     uData.gData.endX = end.x;
     uData.gData.endY = end.y;
 
-    // std::cout << begin.x <<  " , "  << begin.y << std::endl;
-    // std::cout << uData.gData.beginX <<  " , "  << uData.gData.beginY << std::endl;
-
     cv::Rect roi(begin.x, begin.y, end.x - begin.x, end.y - begin.y);
     cv::Mat roiImage = img(roi);
 
-
     int width = std::ceil((double)roiImage.cols / cell_size);
     int height = std::ceil((double)roiImage.rows / cell_size);
-
 
     std::vector<std::vector<int>> matrix(height, std::vector<int>(width, 0));
 
@@ -216,32 +274,26 @@ std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Mat& origImg, cv
     uData.MData.origImg = &origImg;
 
     cv::setMouseCallback("Grid Image", OnMouse, &uData);
-    UpdateGridImage(cell_size, matrix, &uData);
+    std::cout << "" << std::endl;
+    UpdateGridImage(matrix, &uData);
 
-    cv::waitKey(0);
+    cv::waitKey(0); 
 
     return matrix;
 }
 
 
 int main(){
-    cv::Mat img = cv::imread("floor4.png", cv::IMREAD_COLOR);
-    if (img.empty()){
-        std::cout << "Could not read the image" << std::endl;
-        return -1;
-    }
+    cv::Mat img = editImage();
 
     cv::Mat hsv_img; 
     cv::cvtColor(img, hsv_img, cv::COLOR_BGR2HSV);
-    // Define the lower and upper bounds of the green color range
-    // cv::Scalar lower(30, 40, 40);
-    // cv::Scalar upper(90, 255, 255);
 
-    // black color
+    // Define the lower and upper bounds of the black color range
     cv::Scalar lower(0, 0, 0);
     cv::Scalar upper(180, 255, 30);
 
-    // Create a mask to filter out non-green pixels
+    // Create a mask to filter out non-black pixels
     cv::Mat mask;
     cv::inRange(hsv_img, lower, upper, mask);
     // Apply the mask to the original image
@@ -249,23 +301,23 @@ int main(){
     img.copyTo(maskImg, mask);
 
 
-    // Find the coordinates of green pixels
-    std::vector<cv::Point> greenCoords;
+    // Find the coordinates of black pixels
+    std::vector<cv::Point> coords;
     for (int y = 0; y < mask.rows; ++y) {
         for (int x = 0; x < mask.cols; ++x) {
             if (mask.at<uchar>(y, x) == 255) {
-                greenCoords.emplace_back(x, y);
+                coords.emplace_back(x, y);
             }
         }
     }
 
     // Find the highest, lowest, leftmost, and rightmost points
-    cv::Point highestPoint = greenCoords[0];
-    cv::Point lowestPoint = greenCoords[0];
-    cv::Point leftmostPoint = greenCoords[0];
-    cv::Point rightmostPoint = greenCoords[0];
+    cv::Point highestPoint = coords[0];
+    cv::Point lowestPoint = coords[0];
+    cv::Point leftmostPoint = coords[0];
+    cv::Point rightmostPoint = coords[0];
 
-    for (const auto& coord : greenCoords) {
+    for (const auto& coord : coords) {
         if (coord.y < highestPoint.y) {
             highestPoint = coord;
         }
@@ -282,27 +334,7 @@ int main(){
 
     cv::Point startPoint(leftmostPoint.x, highestPoint.y);  // Starting coordinate of the grid
     cv::Point endPoint(rightmostPoint.x, lowestPoint.y);  // Ending coordinate of the grid
-
-    // // Select a pixel position (x, y)
-    // int x = 100;
-    // int y = 200;
-    // // Get the RGB values of the pixel
-    // for(int y=0;y<hsv_img.rows;y++){
-    //     for(int x=0;x<hsv_img.cols;x++){
-    //         cv::Vec3b pixel = hsv_img.at<cv::Vec3b>(y, x);
-    //         int red = pixel[2];
-    //         int blue = pixel[0];
-    //         int green = pixel[1];
-
-    //         if(red >= 0 && green >= 111 && blue >= 0 && red <= 165  && blue <= 165){
-    //             // Output the RGB values
-    //             std::cout << "Pixel (" << x << ", " << y << ") RGB: "
-    //             << "R=" << red << ", G=" << green << ", B=" << blue << std::endl; 
-    //         }
-    //     }
-    // }
     
-
     std::vector<std::vector<int>> matrix = CreateGridImage(maskImg, img, startPoint, endPoint);
 
     return 0;
