@@ -251,6 +251,8 @@ void OnMouse(int event, int x, int y, int flags, void* user_data) {
  * @return std::vector<std::vector<int>> 
  */
 std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Mat& origImg, cv::Point begin, cv::Point end){
+    cv::namedWindow("Grid Image");
+
     int longest_dim = std::max(img.cols, img.rows);
     int cell_size = std::ceil((double)longest_dim / 300);
 
@@ -274,7 +276,6 @@ std::vector<std::vector<int>> CreateGridImage(cv::Mat& img, cv::Mat& origImg, cv
     uData.MData.origImg = &origImg;
 
     cv::setMouseCallback("Grid Image", OnMouse, &uData);
-    std::cout << "" << std::endl;
     UpdateGridImage(matrix, &uData);
 
     cv::waitKey(0); 
