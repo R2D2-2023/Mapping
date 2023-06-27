@@ -30,6 +30,10 @@ class StoreData:
 
 def update_grid_image(matrix, data):
     grid_color = (0, 0, 255)
+    grid_color_green = (0, 255, 0)
+    grid_color_checkpoint = (255, 0, 255)
+    grid_color_corner = (255, 0, 0)
+    grid_color_car = (255, 255, 0)
     grid_img = data.MData.origImg.copy()
     cell_size = data.MData.cell_size
 
@@ -41,7 +45,17 @@ def update_grid_image(matrix, data):
             rect_color = None
             if value == 0:
                 rect_color = grid_color
+            elif value == 6000:
+                rect_color = grid_color_corner
+            elif value == 9999:
+                rect_color = grid_color_car
+            else:
+                if value < 0:
+                    rect_color = grid_color_checkpoint
+                else:
+                    rect_color = grid_color_green
             cv2.rectangle(grid_img, (x, y), (x + cell_size, y + cell_size), rect_color, 1 if value == 0 else -1)
+    
     cv2.imshow("Grid Image", grid_img)
     
 
@@ -162,15 +176,41 @@ def create_grid_image(filename):
     matrix, uData = setData(img, begin, end, origImg)
     
     update_grid_image(matrix, uData)
-
+    place_point(matrix, 0, 0, uData)  # Placing a blue point at position (3, 5)
+    arr1, arr2, arr3 = read_txt("arrays.txt")
+    load_array(arr1, arr2, arr3, matrix, uData)
     cv2.waitKey(0)
     
     return matrix
 
 
+def place_point(matrix, x, y, uData):
+    matrix[y][x] = 9999
+    update_grid_image(matrix, uData)
+
+def load_array(arr1, arr2, arr3, matrix, uData):
+    c1 = 1
+    c2 = -1
+    
+    for cell in arr1:
+        x, y = map(int, cell.split("/"))
+        matrix[x][y] = c1
+        c1 += 1
+        
+    for cell in arr2:
+        x, y = map(int, cell.split("/"))
+        matrix[x][y] = c2
+        c2 -= 1
+        
+    for cell in arr3:
+        x, y = map(int, cell.split("/"))
+        matrix[x][y] = 6000
+    
+    update_grid_image(matrix, uData)
 
 def main():
     matrix = create_grid_image("Toerk_map.png")
+
 
 if __name__ == '__main__':
     main()

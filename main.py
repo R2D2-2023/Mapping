@@ -168,7 +168,6 @@ def OnMouse(event, x, y, flags, user_data):
                         if not is_in_route_or_meetpunten:
                             current_cell = 0
                             update_grid_image(matrix, data)
-                check_surroundings(data)
             elif data.MData.mode == 1:
                 if flags & cv2.EVENT_FLAG_LBUTTON:
                     if current_cell == 0:
@@ -187,7 +186,6 @@ def OnMouse(event, x, y, flags, user_data):
                             meetpunten_ss += f"{meetpunten_coord[0]}/{meetpunten_coord[1]},"
                         print(meetpunten_ss)
                         update_grid_image(matrix, data)
-                check_surroundings(data)
             elif data.MData.mode == 2:  # Add mode 2 logic here
                 if flags & cv2.EVENT_FLAG_LBUTTON:
                     if current_cell == 0:
@@ -201,7 +199,6 @@ def OnMouse(event, x, y, flags, user_data):
                         update_grid_image(matrix, data)
                 elif flags & cv2.EVENT_FLAG_RBUTTON:
                         update_grid_image(matrix, data)
-                check_surroundings(data)
                 
             matrix[i][j] = current_cell  # Update the value in the matrix
 
