@@ -19,8 +19,6 @@ class GridData:
     def __init__(self):
         self.beginX = 0
         self.beginY = 0
-        self.endX = 0
-        self.endY = 0
 
 class StoreData:
     def __init__(self):
@@ -30,6 +28,9 @@ class StoreData:
 
 def update_grid_image(matrix, data):
     grid_color = (0, 0, 255)
+    grid_color_green = (0, 255, 0)
+    grid_color_checkpoint = (255, 0, 255)
+    grid_color_corner = (255, 0, 0)
     grid_img = data.MData.origImg.copy()
     cell_size = data.MData.cell_size
 
@@ -41,9 +42,17 @@ def update_grid_image(matrix, data):
             rect_color = None
             if value == 0:
                 rect_color = grid_color
+            elif value == 6000:
+                rect_color = grid_color_corner
+            else:
+                if value < 0:
+                    rect_color = grid_color_checkpoint
+                else:
+                    rect_color = grid_color_green
             cv2.rectangle(grid_img, (x, y), (x + cell_size, y + cell_size), rect_color, 1 if value == 0 else -1)
-    cv2.imshow("Grid Image", grid_img)
     
+    cv2.imshow("Grid Image", grid_img)
+
 
 
 def read_txt(filename):
@@ -59,6 +68,7 @@ def read_txt(filename):
     
     return array1, array2, array3
 
+
 def setData(img, begin, end, origImg):
     longest_dim = max(img.shape[1], img.shape[0])
     cell_size = int(np.ceil(longest_dim / 300))
@@ -66,8 +76,6 @@ def setData(img, begin, end, origImg):
     uData = StoreData()
     uData.gData.beginX = begin[0]
     uData.gData.beginY = begin[1]
-    uData.gData.endX = end[0]
-    uData.gData.endY = end[1]
 
     roi = (begin[0], begin[1], end[0] - begin[0], end[1] - begin[1])
     roiImage = img[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
@@ -126,6 +134,32 @@ def get_roi(img):
     
     return maskImg, startPoint, endPoint
 
+def make_grid_coords(pixel_x, pixel_y, data):
+    # Extract ROI image coordinates
+    roi_image_coordinates = (
+        pixel_x - data.gData.beginX,
+        pixel_y - data.gData.beginY
+    )
+
+    # Calculate grid cell coordinates
+    grid_cell_coordinates = (
+        roi_image_coordinates[0] // data.MData.cell_size,   # Column index
+        roi_image_coordinates[1] // data.MData.cell_size  # Row index
+    )
+
+    return grid_cell_coordinates
+
+def make_pixel_coords(grid_x, grid_y, data):
+    # Calculate the pixel coordinates relative to the grid's starting point
+    relative_x = grid_x * data.MData.cell_size
+    relative_y = grid_y * data.MData.cell_size
+
+    # Add the grid's starting coordinates to get the absolute pixel coordinates
+    pixel_x = relative_x + data.gData.beginX
+    pixel_y = relative_y + data.gData.beginY
+
+    return pixel_x, pixel_y
+
 
 def create_grid_image(filename):
     
@@ -157,20 +191,52 @@ def create_grid_image(filename):
     
     
     img, begin, end = get_roi(origImg)
-    
 
     matrix, uData = setData(img, begin, end, origImg)
     
     update_grid_image(matrix, uData)
+    
+    arr1, arr2, arr3 = read_txt("arrays.txt")
+    load_array(arr1, arr2, arr3, matrix, uData)
 
+
+    # pixel = make_pixel_coords(220, 50, uData)
+    # print(pixel)
+    
+    grid_coordinates = make_grid_coords(450, 150, uData)
+    print(grid_coordinates)
+
+
+    
     cv2.waitKey(0)
     
     return matrix
 
 
+def load_array(arr1, arr2, arr3, matrix, uData):
+    c1 = 1
+    c2 = -1
+    
+    for cell in arr1:
+        x, y = map(int, cell.split("/"))
+        matrix[x][y] = c1
+        c1 += 1
+        
+    for cell in arr2:
+        x, y = map(int, cell.split("/"))
+        matrix[x][y] = c2
+        c2 -= 1
+        
+    for cell in arr3:
+        x, y = map(int, cell.split("/"))
+        matrix[x][y] = 6000
+    
+    update_grid_image(matrix, uData)
+
+
 
 def main():
-    matrix = create_grid_image("Toerk_map.png")
+    matrix = create_grid_image("map_new_new_edited.png")
 
 if __name__ == '__main__':
     main()
