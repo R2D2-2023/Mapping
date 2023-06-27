@@ -292,7 +292,7 @@ def create_grid_image(filename):
 
 def main():
     
-    matrix = create_grid_image("Toerk_map.png")
+    matrix = create_grid_image("Finallayout.png")
 
 
 if __name__ == '__main__':
