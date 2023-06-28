@@ -22,7 +22,7 @@ class GridData:
         self.endX = 0
         self.endY = 0
 
-class StoreData:
+class StoreData :
     def __init__(self):
         self.gData = GridData()
         self.MData = MouseData()
@@ -209,7 +209,7 @@ def load_array(arr1, arr2, arr3, matrix, uData):
     update_grid_image(matrix, uData)
 
 def main():
-    matrix = create_grid_image("Toerk_map.png")
+    matrix = create_grid_image("Finallayout.png")
 
 
 if __name__ == '__main__':
