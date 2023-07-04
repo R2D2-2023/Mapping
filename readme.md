@@ -11,7 +11,7 @@ This repository contains code in Python and C++ that allows you to create a grid
 
 ## installation
 1. Clone the repository:
-- git clone https://github.com/your-username/mapping.git
+- git clone https://github.com/R2D2-2023/Mapping.git
 - Alternatively, you can download the repository as a ZIP file and extract it.
 
 2. Navigate to the "Ros" directory and follow the instructions in the [README](Ros/README.md) file to download and set up the required dependencies for the Lidar-based mapping module.
