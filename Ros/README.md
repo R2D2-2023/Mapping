@@ -1,9 +1,7 @@
 # Mapping
-Git repository voor de mapping groep (positie bepaling 1)
+Install ros-melodic-desktop-full git ros-melodic-cartographer-ros ros-melodic-gazebo-msgs ros-melodic-gazebos-plugins python-rosdep2 pycrypto libsdl1.2-dev libsdl-image1.2 libsdl-image1.2-dev.
 
-installeer ros-melodic-desktop-full git ros-melodic-cartographer-ros ros-melodic-gazebo-msgs ros-melodic-gazebos-plugins python-rosdep2 pycrypto libsdl1.2-dev libsdl-image1.2 libsdl-image1.2-dev
-
-installeer op x86/x86_64 rosmelodic-desktop-full docker rosbridge_suite
+Install rosmelodic-desktop-full docker rosbridge_suite on x86/x86_64.
 
 ```bash
 source /opt/ros/melodic/setup.bash

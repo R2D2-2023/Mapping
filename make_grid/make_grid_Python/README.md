@@ -1,0 +1,2 @@
+# Mapping
+This Python program allows you to create a grid from a given image, on which you can then draw a route. The program uses the OpenCV library to process images and display the graphical interface.
