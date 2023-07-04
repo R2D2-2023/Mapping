@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['read_5ftxt_0',['read_txt',['../main_8py.html#a9c1ebcb5bb400f8fde553f261149dbf3',1,'main']]]
+  ['makegridcoords_0',['makeGridCoords',['../read_8py.html#a9eae16f09355393f76bf0d814f3c7542',1,'read']]]
 ];

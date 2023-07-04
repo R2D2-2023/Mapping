@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['matrix_0',['matrix',['../classmain_1_1_mouse_data.html#aa4d53118cb09bc7ba9d4ca1fb72ad9e8',1,'main::MouseData']]],
-  ['meetpunten_1',['meetPunten',['../classmain_1_1_mouse_data.html#a5413adca373852fa03b15f9c27831db7',1,'main::MouseData']]],
-  ['mode_2',['mode',['../classmain_1_1_mouse_data.html#aae24628362a3810acab29ff25a8a06df',1,'main::MouseData']]]
+  ['img_0',['img',['../classmain_1_1_mouse_data.html#a5ed5df9ce80d4d4a11d98d01e7947a23',1,'main.MouseData.img()'],['../classread_1_1_mouse_data.html#ad6e5a3862643648a1008adfbe1a12b1e',1,'read.MouseData.img()']]]
 ];
