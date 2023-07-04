@@ -1,0 +1,102 @@
+\hypertarget{main_8cpp}{}\doxysection{main.\+cpp File Reference}
+\label{main_8cpp}\index{main.cpp@{main.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$opencv2/opencv.\+hpp$>$}\newline
+{\ttfamily \#include $<$opencv2/highgui.\+hpp$>$}\newline
+{\ttfamily \#include $<$opencv2/imgproc.\+hpp$>$}\newline
+{\ttfamily \#include $<$opencv2/objdetect.\+hpp$>$}\newline
+{\ttfamily \#include $<$opencv2/ml.\+hpp$>$}\newline
+{\ttfamily \#include $<$cstdlib$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_mouse_data}{Mouse\+Data}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{main_8cpp_ad808c069d5ae46ae1af559f6d756227a}{Update\+Grid\+Image}} (cv\+::\+Mat \&img, int cell\+\_\+size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ \&matrix)
+\begin{DoxyCompactList}\small\item\em for the grid making and updating \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8cpp_a097e6f8665e58bc562ab634757061999}{On\+Mouse}} (int event, int x, int y, int flags, void $\ast$user\+\_\+data)
+\begin{DoxyCompactList}\small\item\em For mouse movement and events. \end{DoxyCompactList}\item 
+std\+::vector$<$ std\+::vector$<$ int $>$ $>$ \mbox{\hyperlink{main_8cpp_af6a313ef4c1105dce4605ded33c52b8e}{Create\+Grid\+Image}} (cv\+::\+Mat \&img, int longest\+\_\+dim, int cell\+\_\+size, int size, std\+::vector$<$ std\+::vector$<$ int $>$ $>$ matrix)
+\begin{DoxyCompactList}\small\item\em Create a Grid Image object. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}\label{main_8cpp_ae66f6b31b5ad750f1fe042a706a4e3d4}} 
+int {\bfseries main} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{main_8cpp_af6a313ef4c1105dce4605ded33c52b8e}\label{main_8cpp_af6a313ef4c1105dce4605ded33c52b8e}} 
+\index{main.cpp@{main.cpp}!CreateGridImage@{CreateGridImage}}
+\index{CreateGridImage@{CreateGridImage}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{CreateGridImage()}{CreateGridImage()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::vector$<$ int $>$ $>$ Create\+Grid\+Image (\begin{DoxyParamCaption}\item[{cv\+::\+Mat \&}]{img,  }\item[{int}]{longest\+\_\+dim,  }\item[{int}]{cell\+\_\+size,  }\item[{int}]{size,  }\item[{std\+::vector$<$ std\+::vector$<$ int $>$ $>$}]{matrix }\end{DoxyParamCaption})}
+
+
+
+Create a Grid Image object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em img} & \\
+\hline
+{\em longest\+\_\+dim} & \\
+\hline
+{\em cell\+\_\+size} & \\
+\hline
+{\em size} & \\
+\hline
+{\em matrix} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+std\+::vector$<$std\+::vector$<$int$>$$>$ 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8cpp_a097e6f8665e58bc562ab634757061999}\label{main_8cpp_a097e6f8665e58bc562ab634757061999}} 
+\index{main.cpp@{main.cpp}!OnMouse@{OnMouse}}
+\index{OnMouse@{OnMouse}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{OnMouse()}{OnMouse()}}
+{\footnotesize\ttfamily void On\+Mouse (\begin{DoxyParamCaption}\item[{int}]{event,  }\item[{int}]{x,  }\item[{int}]{y,  }\item[{int}]{flags,  }\item[{void $\ast$}]{user\+\_\+data }\end{DoxyParamCaption})}
+
+
+
+For mouse movement and events. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em event} & \\
+\hline
+{\em x} & \\
+\hline
+{\em y} & \\
+\hline
+{\em flags} & \\
+\hline
+{\em user\+\_\+data} & \\
+\hline
+\end{DoxyParams}
+this is for the movement of the mouse and button press of the mouse
+
+so it can see where on the grid it is \mbox{\Hypertarget{main_8cpp_ad808c069d5ae46ae1af559f6d756227a}\label{main_8cpp_ad808c069d5ae46ae1af559f6d756227a}} 
+\index{main.cpp@{main.cpp}!UpdateGridImage@{UpdateGridImage}}
+\index{UpdateGridImage@{UpdateGridImage}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{UpdateGridImage()}{UpdateGridImage()}}
+{\footnotesize\ttfamily void Update\+Grid\+Image (\begin{DoxyParamCaption}\item[{cv\+::\+Mat \&}]{img,  }\item[{int}]{cell\+\_\+size,  }\item[{std\+::vector$<$ std\+::vector$<$ int $>$ $>$ \&}]{matrix }\end{DoxyParamCaption})}
+
+
+
+for the grid making and updating 
+
+
+\begin{DoxyParams}{Parameters}
+{\em img} & \\
+\hline
+{\em cell\+\_\+size} & \\
+\hline
+{\em matrix} & \\
+\hline
+\end{DoxyParams}
+is used to update the grid based on the mouse 
