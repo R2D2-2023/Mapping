@@ -57,6 +57,7 @@ For the Lidar-based mapping module, please refer to the [Ros](Ros) directory for
 
 ## Acknowledgements
 - [OpenCV](https://opencv.org/) - Open Source Computer Vision Library
+- [cartographer](https://github.com/cartographer-project/cartographer)  - Open Source Lidar Library
 
 Please refer to the individual code files for specific attributions and licenses.
 
