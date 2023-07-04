@@ -53,6 +53,9 @@ For the Lidar-based mapping module, please refer to the [Ros](Ros) directory for
 - [@JSaurusRex](https://github.com/JSaurusRex)
 - [@LukkenS-HU](https://github.com/LukkenS-HU)
 
+## Contributors
+- [@northernlakeNL](https://github.com/northernlakeNL)
+
 ## License
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
