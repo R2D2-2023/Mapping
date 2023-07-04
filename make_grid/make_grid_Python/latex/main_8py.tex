@@ -1,0 +1,248 @@
+\hypertarget{main_8py}{}\doxysection{main.\+py File Reference}
+\label{main_8py}\index{main.py@{main.py}}
+
+
+functions for creating a grid over a given image, for drawing on the grid  
+
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classmain_1_1_mouse_data}{main.\+Mouse\+Data}}
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classmain_1_1_grid_data}{main.\+Grid\+Data}}
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classmain_1_1_store_data}{main.\+Store\+Data}}
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{main_8py_a3242a76d548eeef693f302f09ec8665a}{main.\+update\+\_\+grid\+\_\+image}} (matrix, data)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8py_a1efe7e0a91fc3fa6b496f7b39d189da6}\label{main_8py_a1efe7e0a91fc3fa6b496f7b39d189da6}} 
+def {\bfseries main.\+show\+Initial\+Grid} (matrix, data)
+\item 
+def \mbox{\hyperlink{main_8py_a421366c2f9106f15f66c35cb038825ff}{main.\+edit\+\_\+image}} (filename)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{main_8py_ac9cc3feffddd547429aad2fb3f0c42d5}{main.\+get\+\_\+roi}} (img)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{main_8py_a679370b5015058c847c7d5959eeec679}{main.\+On\+Mouse}} (event, x, y, flags, user\+\_\+data)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{main_8py_abc626217e3a971b867960f934c8ab117}{main.\+set\+Data}} (img, begin, end, orig\+Img)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{main_8py_a8156283426cd5c49c72e2d3c2da91ddc}{main.\+write\+\_\+to\+\_\+txt}} (u\+Data, filename)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{main_8py_a9c1ebcb5bb400f8fde553f261149dbf3}{main.\+read\+\_\+txt}} (filename)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{main_8py_a771f3d32b385701ff1cb6c2f344ce9ff}{main.\+create\+\_\+grid\+\_\+image}} (filename)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8py_af613cea4cba4fb7de8e40896b3368945}\label{main_8py_af613cea4cba4fb7de8e40896b3368945}} 
+def {\bfseries main.\+main} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+functions for creating a grid over a given image, for drawing on the grid 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{main_8py_a771f3d32b385701ff1cb6c2f344ce9ff}\label{main_8py_a771f3d32b385701ff1cb6c2f344ce9ff}} 
+\index{main.py@{main.py}!create\_grid\_image@{create\_grid\_image}}
+\index{create\_grid\_image@{create\_grid\_image}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{create\_grid\_image()}{create\_grid\_image()}}
+{\footnotesize\ttfamily def main.\+create\+\_\+grid\+\_\+image (\begin{DoxyParamCaption}\item[{}]{filename }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Creates a grid image with a centered and scaled version of the input image.
+
+This function takes an input image file and performs the following steps\+:
+\begin{DoxyItemize}
+\item Reads the image file and checks if it was successfully read.
+\item Calculates the aspect ratio of the original image.
+\item Scales the image to fit within the screen dimensions while maintaining the aspect ratio.
+\item Centers the scaled image on the screen.
+\item Creates a named window for the grid image.
+\item Sets a mouse callback function for the window to handle user interactions.
+\item Displays the grid image and waits for a key press.
+\item Writes data from the user interactions to a text file.
+\item Reads and prints arrays from the text file.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & The path to the input image file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The grid image matrix. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8py_a421366c2f9106f15f66c35cb038825ff}\label{main_8py_a421366c2f9106f15f66c35cb038825ff}} 
+\index{main.py@{main.py}!edit\_image@{edit\_image}}
+\index{edit\_image@{edit\_image}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{edit\_image()}{edit\_image()}}
+{\footnotesize\ttfamily def main.\+edit\+\_\+image (\begin{DoxyParamCaption}\item[{}]{filename }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Edits an image by resizing and centering it on the screen.
+
+This function reads an image from the specified file, resizes it to fit the screen dimensions while preserving the aspect ratio, and centers it on the screen.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & The path to the image file to be edited. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The edited image. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8py_ac9cc3feffddd547429aad2fb3f0c42d5}\label{main_8py_ac9cc3feffddd547429aad2fb3f0c42d5}} 
+\index{main.py@{main.py}!get\_roi@{get\_roi}}
+\index{get\_roi@{get\_roi}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{get\_roi()}{get\_roi()}}
+{\footnotesize\ttfamily def main.\+get\+\_\+roi (\begin{DoxyParamCaption}\item[{}]{img }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Extracts the ROI from an image.
+
+This function takes an image as input and returns the ROI, start point, and end point of the grid.
+
+
+\begin{DoxyParams}{Parameters}
+{\em img} & The input image. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A tuple containing the ROI image, start point, and end point. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8py_a679370b5015058c847c7d5959eeec679}\label{main_8py_a679370b5015058c847c7d5959eeec679}} 
+\index{main.py@{main.py}!OnMouse@{OnMouse}}
+\index{OnMouse@{OnMouse}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{OnMouse()}{OnMouse()}}
+{\footnotesize\ttfamily def main.\+On\+Mouse (\begin{DoxyParamCaption}\item[{}]{event,  }\item[{}]{x,  }\item[{}]{y,  }\item[{}]{flags,  }\item[{}]{user\+\_\+data }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Callback function for handling mouse events.
+
+This function is called when a mouse event occurs.
+
+
+\begin{DoxyParams}{Parameters}
+{\em event} & The type of mouse event (e.\+g., cv2.\+EVENT\+\_\+\+MOUSEMOVE, cv2.\+EVENT\+\_\+\+MOUSEWHEEL). \\
+\hline
+{\em x} & The x-\/coordinate of the mouse cursor. \\
+\hline
+{\em y} & The y-\/coordinate of the mouse cursor. \\
+\hline
+{\em flags} & Additional flags indicating the state of the mouse buttons. \\
+\hline
+{\em user\+\_\+data} & User-\/defined data passed to the callback function. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{main_8py_a9c1ebcb5bb400f8fde553f261149dbf3}\label{main_8py_a9c1ebcb5bb400f8fde553f261149dbf3}} 
+\index{main.py@{main.py}!read\_txt@{read\_txt}}
+\index{read\_txt@{read\_txt}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{read\_txt()}{read\_txt()}}
+{\footnotesize\ttfamily def main.\+read\+\_\+txt (\begin{DoxyParamCaption}\item[{}]{filename }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Read the contents of a text file and split the data into separate arrays.
+
+This function reads the contents of a text file specified by the filename parameter. It then splits the data into three separate arrays and returns them.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & The name of the text file to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Three arrays containing the data from the text file. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8py_abc626217e3a971b867960f934c8ab117}\label{main_8py_abc626217e3a971b867960f934c8ab117}} 
+\index{main.py@{main.py}!setData@{setData}}
+\index{setData@{setData}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{setData()}{setData()}}
+{\footnotesize\ttfamily def main.\+set\+Data (\begin{DoxyParamCaption}\item[{}]{img,  }\item[{}]{begin,  }\item[{}]{end,  }\item[{}]{orig\+Img }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Sets the data for image processing.
+
+This function sets the necessary data for processing image data. It calculates the longest dimension of the image and determines the cell size based on it. It creates an instance of the Store\+Data class and sets the begin and end coordinates. It extracts the region of interest (ROI) from the image and calculates the dimensions of the ROI image. It initializes a matrix with the appropriate dimensions and assigns it to the Store\+Data instance. Finally, it assigns other required parameters to the Store\+Data instance and returns the matrix and the Store\+Data instance.
+
+
+\begin{DoxyParams}{Parameters}
+{\em img} & The input image. \\
+\hline
+{\em begin} & The starting coordinates of the region of interest (ROI). \\
+\hline
+{\em end} & The ending coordinates of the region of interest (ROI). \\
+\hline
+{\em orig\+Img} & The original image. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A tuple containing the matrix and an instance of the Store\+Data class. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8py_a3242a76d548eeef693f302f09ec8665a}\label{main_8py_a3242a76d548eeef693f302f09ec8665a}} 
+\index{main.py@{main.py}!update\_grid\_image@{update\_grid\_image}}
+\index{update\_grid\_image@{update\_grid\_image}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{update\_grid\_image()}{update\_grid\_image()}}
+{\footnotesize\ttfamily def main.\+update\+\_\+grid\+\_\+image (\begin{DoxyParamCaption}\item[{}]{matrix,  }\item[{}]{data }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Updates the grid image based on the provided matrix data.
+
+This function takes a matrix and data object as input and updates the grid image. The grid image is generated by drawing rectangles on a copy of the original image using colors based on the values in the matrix.
+
+
+\begin{DoxyParams}{Parameters}
+{\em matrix} & The matrix containing the values. \\
+\hline
+{\em data} & The data object containing additional information.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+None. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8py_a8156283426cd5c49c72e2d3c2da91ddc}\label{main_8py_a8156283426cd5c49c72e2d3c2da91ddc}} 
+\index{main.py@{main.py}!write\_to\_txt@{write\_to\_txt}}
+\index{write\_to\_txt@{write\_to\_txt}!main.py@{main.py}}
+\doxysubsubsection{\texorpdfstring{write\_to\_txt()}{write\_to\_txt()}}
+{\footnotesize\ttfamily def main.\+write\+\_\+to\+\_\+txt (\begin{DoxyParamCaption}\item[{}]{u\+Data,  }\item[{}]{filename }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Writes data to a text file.
+
+This function takes input data in the form of a {\ttfamily u\+Data} object and a filename. It converts the tuples within the {\ttfamily u\+Data} object to strings and combines them into a single string. The resulting string is then written to a text file specified by the filename.
+
+
+\begin{DoxyParams}{Parameters}
+{\em u\+Data} & The input data object containing route, meet\+Punten, and hoeken attributes. \\
+\hline
+{\em filename} & The name of the text file to write the data to. \\
+\hline
+\end{DoxyParams}
