@@ -4,9 +4,9 @@ This repository contains code in Python and C++ that allows you to create a grid
 
 
 ## Prerequisites
-- Python 3.x
+- Python 3.9.x or higher
 - C++ compiler
-- OpenCV library
+- [OpenCV library](https://opencv.org/)
 
 
 ## installation
@@ -21,7 +21,7 @@ This repository contains code in Python and C++ that allows you to create a grid
 ### Python Code
 
 1. Install the necessary Python packages:
-- pip install opencv-python numpy
+- pip install -r /path/to/requirements.txt [requirements](make_grid/make_grid_Python/requirements.txt)
 2. Run the Python script to generate a grid from an image and draw on it
 3. Save the drawn values on closing the program
 4. run read.py to visualize the saved route
