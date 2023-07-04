@@ -1,0 +1,225 @@
+\hypertarget{read_8py}{}\doxysection{read.\+py File Reference}
+\label{read_8py}\index{read.py@{read.py}}
+
+
+functions for reading a array and for drawing on the grid  
+
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classread_1_1_mouse_data}{read.\+Mouse\+Data}}
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classread_1_1_grid_data}{read.\+Grid\+Data}}
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classread_1_1_store_data}{read.\+Store\+Data}}
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{read_8py_a0f9bfdf3f0636f57856f7168788dad01}{read.\+update\+Grid\+Image}} (matrix, data)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{read_8py_a1413ef459b00471833f52e902ff9b866}{read.\+read\+Txt}} (filename)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{read_8py_a41beae089f7e26297dd5eb4ee77fe11c}{read.\+set\+Data}} (img, begin, end, orig\+\_\+\+Img)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{read_8py_a734f51e18b40830a7842196fbdf3c7f8}{read.\+get\+Roi}} (img)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{read_8py_a9eae16f09355393f76bf0d814f3c7542}{read.\+make\+Grid\+Coords}} (pixel\+\_\+x, pixel\+\_\+y, data, matrix)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{read_8py_ac2ec90faa0a9459c46ff313b47509d01}{read.\+load\+Array}} (arr1, arr2, arr3, matrix, u\+\_\+\+Data)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+def \mbox{\hyperlink{read_8py_a71ff49d137e451a09298d439bf58e10d}{read.\+create\+Grid\+Image}} (filename)
+\begin{DoxyCompactList}\small\item\em ! \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{read_8py_a7b2cbf773533dad4c9ad3b2603c657f7}\label{read_8py_a7b2cbf773533dad4c9ad3b2603c657f7}} 
+def {\bfseries read.\+main} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+functions for reading a array and for drawing on the grid 
+
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{read_8py_a71ff49d137e451a09298d439bf58e10d}\label{read_8py_a71ff49d137e451a09298d439bf58e10d}} 
+\index{read.py@{read.py}!createGridImage@{createGridImage}}
+\index{createGridImage@{createGridImage}!read.py@{read.py}}
+\doxysubsubsection{\texorpdfstring{createGridImage()}{createGridImage()}}
+{\footnotesize\ttfamily def read.\+create\+Grid\+Image (\begin{DoxyParamCaption}\item[{}]{filename }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Creates a grid image with a centered and scaled version of the input image.
+
+This function takes an input image file and performs the following steps\+:
+\begin{DoxyItemize}
+\item Reads the image file and checks if it was successfully read.
+\item Calculates the aspect ratio of the original image.
+\item Scales the image to fit within the screen dimensions while maintaining the aspect ratio.
+\item Centers the scaled image on the screen.
+\item Creates a named window for the grid image.
+\item Sets a mouse callback function for the window to handle user interactions.
+\item Displays the grid image and waits for a key press.
+\item Writes data from the user interactions to a text file.
+\item Reads and prints arrays from the text file.
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & The path to the input image file.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The grid image matrix. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{read_8py_a734f51e18b40830a7842196fbdf3c7f8}\label{read_8py_a734f51e18b40830a7842196fbdf3c7f8}} 
+\index{read.py@{read.py}!getRoi@{getRoi}}
+\index{getRoi@{getRoi}!read.py@{read.py}}
+\doxysubsubsection{\texorpdfstring{getRoi()}{getRoi()}}
+{\footnotesize\ttfamily def read.\+get\+Roi (\begin{DoxyParamCaption}\item[{}]{img }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Extracts the ROI from an image.
+
+This function takes an image as input and returns the ROI, start point, and end point of the grid.
+
+
+\begin{DoxyParams}{Parameters}
+{\em img} & The input image.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A tuple containing the ROI image, start point, and end point. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{read_8py_ac2ec90faa0a9459c46ff313b47509d01}\label{read_8py_ac2ec90faa0a9459c46ff313b47509d01}} 
+\index{read.py@{read.py}!loadArray@{loadArray}}
+\index{loadArray@{loadArray}!read.py@{read.py}}
+\doxysubsubsection{\texorpdfstring{loadArray()}{loadArray()}}
+{\footnotesize\ttfamily def read.\+load\+Array (\begin{DoxyParamCaption}\item[{}]{arr1,  }\item[{}]{arr2,  }\item[{}]{arr3,  }\item[{}]{matrix,  }\item[{}]{u\+\_\+\+Data }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Load arrays into a matrix and update the grid image.
+
+This function takes three arrays and a matrix and loads the cells from the arrays into the matrix. The cells from {\ttfamily arr1} are assigned incremental values starting from 1. The cells from {\ttfamily arr2} are assigned decremental values starting from -\/1. The cells from {\ttfamily arr3} are assigned a fixed value of 6000. After loading the cells, the function calls {\ttfamily update\+Grid\+Image} to update the grid image using the updated matrix and {\ttfamily u\+\_\+\+Data}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em arr1} & (list)\+: List of cells for array 1. \\
+\hline
+{\em arr2} & (list)\+: List of cells for array 2. \\
+\hline
+{\em arr3} & (list)\+: List of cells for array 3. \\
+\hline
+{\em matrix} & (list)\+: 2D matrix. \\
+\hline
+{\em u\+\_\+\+Data} & (object)\+: Data for updating the grid image. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{read_8py_a9eae16f09355393f76bf0d814f3c7542}\label{read_8py_a9eae16f09355393f76bf0d814f3c7542}} 
+\index{read.py@{read.py}!makeGridCoords@{makeGridCoords}}
+\index{makeGridCoords@{makeGridCoords}!read.py@{read.py}}
+\doxysubsubsection{\texorpdfstring{makeGridCoords()}{makeGridCoords()}}
+{\footnotesize\ttfamily def read.\+make\+Grid\+Coords (\begin{DoxyParamCaption}\item[{}]{pixel\+\_\+x,  }\item[{}]{pixel\+\_\+y,  }\item[{}]{data,  }\item[{}]{matrix }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Convert pixel coordinates to grid cell coordinates, update the matrix, and return the grid cell coordinates.
+
+This function takes the pixel coordinates (pixel\+\_\+x, pixel\+\_\+y) and converts them to grid cell coordinates based on the data\textquotesingle{}s cell size. It updates the matrix by setting the value of the previous grid cell to 0 (if it exists) and the value of the new grid cell to 1000. After updating the matrix, it calls {\ttfamily update\+Grid\+Image} to update the grid image using the updated matrix and data. Finally, it returns the grid cell coordinates.
+
+
+\begin{DoxyParams}{Parameters}
+{\em pixel\+\_\+x} & (int)\+: X-\/coordinate in pixels. \\
+\hline
+{\em pixel\+\_\+y} & (int)\+: Y-\/coordinate in pixels. \\
+\hline
+{\em data} & (object)\+: Data containing information about the grid. \\
+\hline
+{\em matrix} & (list)\+: 2D matrix.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+tuple\+: Grid cell coordinates as a tuple (row index, column index). 
+\end{DoxyReturn}
+\mbox{\Hypertarget{read_8py_a1413ef459b00471833f52e902ff9b866}\label{read_8py_a1413ef459b00471833f52e902ff9b866}} 
+\index{read.py@{read.py}!readTxt@{readTxt}}
+\index{readTxt@{readTxt}!read.py@{read.py}}
+\doxysubsubsection{\texorpdfstring{readTxt()}{readTxt()}}
+{\footnotesize\ttfamily def read.\+read\+Txt (\begin{DoxyParamCaption}\item[{}]{filename }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Read the contents of a text file and split the data into separate arrays.
+
+This function reads the contents of a text file specified by the filename parameter. It then splits the data into three separate arrays and returns them.
+
+
+\begin{DoxyParams}{Parameters}
+{\em filename} & The name of the text file to read. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Three arrays containing the data from the text file. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{read_8py_a41beae089f7e26297dd5eb4ee77fe11c}\label{read_8py_a41beae089f7e26297dd5eb4ee77fe11c}} 
+\index{read.py@{read.py}!setData@{setData}}
+\index{setData@{setData}!read.py@{read.py}}
+\doxysubsubsection{\texorpdfstring{setData()}{setData()}}
+{\footnotesize\ttfamily def read.\+set\+Data (\begin{DoxyParamCaption}\item[{}]{img,  }\item[{}]{begin,  }\item[{}]{end,  }\item[{}]{orig\+\_\+\+Img }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Sets the data for image processing.
+
+This function sets the necessary data for processing image data. It calculates the longest dimension of the image and determines the cell size based on it. It creates an instance of the Store\+Data class and sets the begin and end coordinates. It extracts the region of interest (ROI) from the image and calculates the dimensions of the ROI image. It initializes a matrix with the appropriate dimensions and assigns it to the Store\+Data instance. Finally, it assigns other required parameters to the Store\+Data instance and returns the matrix and the Store\+Data instance.
+
+
+\begin{DoxyParams}{Parameters}
+{\em img} & The input image. \\
+\hline
+{\em begin} & The starting coordinates of the region of interest (ROI). \\
+\hline
+{\em end} & The ending coordinates of the region of interest (ROI). \\
+\hline
+{\em orig\+Img} & The original image.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A tuple containing the matrix and an instance of the Store\+Data class. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{read_8py_a0f9bfdf3f0636f57856f7168788dad01}\label{read_8py_a0f9bfdf3f0636f57856f7168788dad01}} 
+\index{read.py@{read.py}!updateGridImage@{updateGridImage}}
+\index{updateGridImage@{updateGridImage}!read.py@{read.py}}
+\doxysubsubsection{\texorpdfstring{updateGridImage()}{updateGridImage()}}
+{\footnotesize\ttfamily def read.\+update\+Grid\+Image (\begin{DoxyParamCaption}\item[{}]{matrix,  }\item[{}]{data }\end{DoxyParamCaption})}
+
+
+
+! 
+
+Updates the grid image based on the provided matrix data.
+
+This function takes a matrix and data object as input and updates the grid image. The grid image is generated by drawing rectangles on a copy of the original image using colors based on the values in the matrix.
+
+
+\begin{DoxyParams}{Parameters}
+{\em matrix} & The matrix containing the values. \\
+\hline
+{\em data} & The data object containing additional information. \\
+\hline
+\end{DoxyParams}
