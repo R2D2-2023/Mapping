@@ -1,5 +1,4 @@
 import cv2
-import math
 import numpy as np
 from win32api import GetSystemMetrics
 
@@ -8,47 +7,44 @@ class MouseData:
         self.matrix = None
         self.cell_size = 0
         self.img = None
-        self.origImg = None
+        self.orig_Img = None
         self.counter = 0
         self.checkpoint_counter = -5
-        self.robotX = 10
-        self.robotY = 10
-        self.mode = 0
+        self.before = None
 
 class GridData:
     def __init__(self):
-        self.beginX = 0
-        self.beginY = 0
-        self.endX = 0
-        self.endY = 0
+        self.begin_X = 0
+        self.begin_Y = 0
+        self.start = 0
+        self.end = 0
 
 class StoreData :
     def __init__(self):
-        self.gData = GridData()
-        self.MData = MouseData()
+        self.G_Data = GridData()
+        self.M_Data = MouseData()
 
 
-def update_grid_image(matrix, data):
+def updateGridImage(matrix, data):
     grid_color = (0, 0, 255)
     grid_color_green = (0, 255, 0)
     grid_color_checkpoint = (255, 0, 255)
-    grid_color_corner = (255, 0, 0)
-    grid_color_car = (255, 255, 0)
-    grid_img = data.MData.origImg.copy()
-    cell_size = data.MData.cell_size
+    grid_color_corner = (255, 255, 0)
+    grid_img = data.M_Data.orig_Img.copy()
+    cell_size = data.M_Data.cell_size
 
     for i in range(len(matrix)):
-        y = data.gData.beginY + i * cell_size
+        y = data.G_Data.begin_Y + i * cell_size
         for j in range(len(matrix[i])):
-            x = data.gData.beginX + j * cell_size
+            x = data.G_Data.begin_X + j * cell_size
             value = matrix[i][j]
             rect_color = None
             if value == 0:
                 rect_color = grid_color
             elif value == 6000:
                 rect_color = grid_color_corner
-            elif value == 9999:
-                rect_color = grid_color_car
+            elif value == 1000:
+                rect_color = (255, 0, 0)
             else:
                 if value < 0:
                     rect_color = grid_color_checkpoint
@@ -57,10 +53,9 @@ def update_grid_image(matrix, data):
             cv2.rectangle(grid_img, (x, y), (x + cell_size, y + cell_size), rect_color, 1 if value == 0 else -1)
     
     cv2.imshow("Grid Image", grid_img)
-    
 
 
-def read_txt(filename):
+def readTxt(filename):
     # Read the contents of the text file
     with open(filename, "r") as file:
         data = file.read()
@@ -73,15 +68,17 @@ def read_txt(filename):
     
     return array1, array2, array3
 
-def setData(img, begin, end, origImg):
+
+def setData(img, begin, end, orig_Img):
     longest_dim = max(img.shape[1], img.shape[0])
     cell_size = int(np.ceil(longest_dim / 300))
 
-    uData = StoreData()
-    uData.gData.beginX = begin[0]
-    uData.gData.beginY = begin[1]
-    uData.gData.endX = end[0]
-    uData.gData.endY = end[1]
+    u_Data = StoreData()
+    u_Data.G_Data.begin_X = begin[0]
+    u_Data.G_Data.begin_Y = begin[1]
+    u_Data.G_Data.start = begin
+    u_Data.G_Data.end = end
+    
 
     roi = (begin[0], begin[1], end[0] - begin[0], end[1] - begin[1])
     roiImage = img[roi[1]:roi[1]+roi[3], roi[0]:roi[0]+roi[2]]
@@ -91,15 +88,15 @@ def setData(img, begin, end, origImg):
 
     matrix = [[0] * width for _ in range(height)]
 
-    uData.MData.matrix = matrix
-    uData.MData.cell_size = cell_size
-    uData.MData.img = img
-    uData.MData.origImg = origImg
+    u_Data.M_Data.matrix = matrix
+    u_Data.M_Data.cell_size = cell_size
+    u_Data.M_Data.img = img
+    u_Data.M_Data.orig_Img = orig_Img
     
-    return matrix, uData
+    return matrix, u_Data
 
 
-def get_roi(img):
+def getRoi(img):
     hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # Define the lower and upper bounds of the black color range
@@ -140,55 +137,26 @@ def get_roi(img):
     
     return maskImg, startPoint, endPoint
 
-
-def create_grid_image(filename):
+def makeGridCoords(pixel_x, pixel_y, data, matrix):
+    if data.M_Data.before is not None:
+        before = data.M_Data.before
+        matrix[before[0]][before[1]] = 0
     
-    screenWidth = GetSystemMetrics(0)
-    screenHeight = GetSystemMetrics(1)
+    # Use pixel coordinates as grid cell coordinates
+    grid_cell_coordinates = (
+        pixel_x // data.M_Data.cell_size,  # Column index
+        pixel_y // data.M_Data.cell_size   # Row index
+    )
 
-    origImg = cv2.imread(filename, cv2.IMREAD_COLOR)
-    if origImg is None:
-        print("Could not read the image")
-
-    imageAspectRatio = origImg.shape[1] / origImg.shape[0]
+    data.M_Data.before = grid_cell_coordinates
     
-    maxWidth = screenWidth
-    maxHeight = screenHeight
- 
-    scaledWidth = maxWidth
-    scaledHeight = int(scaledWidth / imageAspectRatio)
-
-    if scaledHeight > maxHeight:
-        scaledHeight = maxHeight
-        scaledWidth = int(scaledHeight * imageAspectRatio)
-
-    posX = (screenWidth - scaledWidth) // 2
-    posY = (screenHeight - scaledHeight) // 2
-
-    cv2.namedWindow("Grid Image")
-    cv2.moveWindow("Grid Image", posX, posY)
-    origImg = cv2.resize(origImg, (scaledWidth, scaledHeight))
+    matrix[grid_cell_coordinates[0]][grid_cell_coordinates[1]] = 1000
+    updateGridImage(matrix, data)
     
-    
-    img, begin, end = get_roi(origImg)
-    
-
-    matrix, uData = setData(img, begin, end, origImg)
-    
-    update_grid_image(matrix, uData)
-    place_point(matrix, 0, 0, uData)  # Placing a blue point at position (3, 5)
-    arr1, arr2, arr3 = read_txt("arrays.txt")
-    load_array(arr1, arr2, arr3, matrix, uData)
-    cv2.waitKey(0)
-    
-    return matrix
+    return grid_cell_coordinates
 
 
-def place_point(matrix, x, y, uData):
-    matrix[y][x] = 9999
-    update_grid_image(matrix, uData)
-
-def load_array(arr1, arr2, arr3, matrix, uData):
+def loadArray(arr1, arr2, arr3, matrix, u_Data):
     c1 = 1
     c2 = -1
     
@@ -206,11 +174,57 @@ def load_array(arr1, arr2, arr3, matrix, uData):
         x, y = map(int, cell.split("/"))
         matrix[x][y] = 6000
     
-    update_grid_image(matrix, uData)
+    updateGridImage(matrix, u_Data)
+
+
+def createGridImage(filename):
+    
+    screenWidth = GetSystemMetrics(0)
+    screenHeight = GetSystemMetrics(1)
+
+    orig_Img = cv2.imread(filename, cv2.IMREAD_COLOR)
+    if orig_Img is None:
+        print("Could not read the image")
+
+    imageAspectRatio = orig_Img.shape[1] / orig_Img.shape[0]
+    
+    maxWidth = screenWidth
+    maxHeight = screenHeight
+ 
+    scaledWidth = maxWidth
+    scaledHeight = int(scaledWidth / imageAspectRatio)
+
+    if scaledHeight > maxHeight:
+        scaledHeight = maxHeight
+        scaledWidth = int(scaledHeight * imageAspectRatio)
+
+    posX = (screenWidth - scaledWidth) // 2
+    posY = (screenHeight - scaledHeight) // 2
+
+    cv2.namedWindow("Grid Image")
+    cv2.moveWindow("Grid Image", posX, posY)
+    orig_Img = cv2.resize(orig_Img, (scaledWidth, scaledHeight))
+    
+    
+    img, begin, end = getRoi(orig_Img)
+
+    matrix, u_Data = setData(img, begin, end, orig_Img)
+    
+    updateGridImage(matrix, u_Data)
+    
+    arr1, arr2, arr3 = readTxt("arrays.txt")
+    loadArray(arr1, arr2, arr3, matrix, u_Data)
+    
+    grid_coordinates = makeGridCoords(450, 150, u_Data, matrix)
+    print(grid_coordinates)
+    
+    cv2.waitKey(0)
+    
+    return matrix
+
 
 def main():
-    matrix = create_grid_image("Finallayout.png")
-
+    matrix = createGridImage("map_new_new_edited.png")
 
 if __name__ == '__main__':
     main()

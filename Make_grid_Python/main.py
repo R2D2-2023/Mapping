@@ -1,5 +1,4 @@
 import cv2
-import math
 import numpy as np
 from win32api import GetSystemMetrics
 
@@ -177,7 +176,7 @@ def edit_image(filename):
     
     maxWidth = screenWidth
     maxHeight = screenHeight
- 
+
     scaledWidth = maxWidth
     scaledHeight = int(scaledWidth / imageAspectRatio)
 
@@ -271,6 +270,7 @@ def OnMouse(event, x, y, flags, user_data):
                     if current_cell == 0:
                         data.MData.counter += 1
                         current_cell = data.MData.counter
+                        matrix[i][j] = current_cell  # Update the value in the matrix
                         update_grid_image(matrix, data)
                         data.MData.route.append((i, j))
                         print(f"{j}/{i}: {data.MData.counter}")
@@ -285,34 +285,34 @@ def OnMouse(event, x, y, flags, user_data):
                             if meetpunten_it is not None:
                                 data.MData.meetPunten.pop(meetpunten_it)
                             current_cell = 0
+                            matrix[i][j] = current_cell  # Update the value in the matrix
                             update_grid_image(matrix, data)
                             data.MData.delete.append((i, j))
             elif data.MData.mode == 1:
                 if flags & cv2.EVENT_FLAG_LBUTTON:
                     if current_cell == 0:
                         current_cell = 9999
+                        matrix[i][j] = current_cell  # Update the value in the matrix
                         update_grid_image(matrix, data)
                         data.MData.robotX = i
                         data.MData.robotY = j
                 elif flags & cv2.EVENT_FLAG_RBUTTON:
                     if current_cell == 0:
-                        data.MData.checkpoint_counter -= 1
                         current_cell = data.MData.checkpoint_counter
-                        update_grid_image(matrix, data)
+                        matrix[i][j] = current_cell  # Update the value in the matrix
                         data.MData.meetPunten.append((i, j))
+                        update_grid_image(matrix, data)
                         print("meetPunten:", ",".join(f"{coord[0]}/{coord[1]}" for coord in data.MData.meetPunten))
             elif data.MData.mode == 2:
                 if flags & cv2.EVENT_FLAG_LBUTTON:
                     if current_cell == 0:
                         current_cell = 6000
+                        matrix[i][j] = current_cell  # Update the value in the matrix
                         update_grid_image(matrix, data)
                         data.MData.hoeken.append((i, j))
                         print("hoeken:", ",".join(f"{coord[0]}/{coord[1]}" for coord in data.MData.hoeken))
                 elif flags & cv2.EVENT_FLAG_RBUTTON:
                     update_grid_image(matrix, data)
-
-            matrix[i][j] = current_cell  # Update the value in the matrix
-
         elif event == cv2.EVENT_MOUSEWHEEL:
             data.MData.mode = (data.MData.mode + 1) % 3  # Cycle through modes 0, 1, and 2
             print(f"mode: {data.MData.mode}")
@@ -439,6 +439,7 @@ def create_grid_image(filename):
     
     img, begin, end = get_roi(origImg)
     
+
     matrix, uData = setData(img, begin, end, origImg)
     
     cv2.setMouseCallback("Grid Image", OnMouse, uData)
@@ -447,6 +448,12 @@ def create_grid_image(filename):
     cv2.waitKey(0)
     
     write_to_txt(uData, "arrays.txt")
+    
+    arr1, arr2, arr3 = read_txt("arrays.txt")
+    print(arr1, "\n")
+    print(arr2, "\n")
+    print(arr3, "\n")
+
     
     arr1, arr2, arr3 = read_txt("arrays.txt")
     print(arr1, "\n")
