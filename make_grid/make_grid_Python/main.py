@@ -29,7 +29,7 @@ class MouseData:
         ## The current image.
         self.img = None
         ## The original image.
-        self.origImg = None
+        self.orig_img = None
         ## The counter value.
         self.counter = 0
         ## The checkpoint counter value.
@@ -94,7 +94,7 @@ class StoreData:
 #
 # @return None.
 #
-def update_grid_image(matrix, data):
+def updateGridImage(matrix, data):
     grid_color = (0, 0, 255)
     grid_color_green = (0, 255, 0)
     grid_color_checkpoint = (255, 0, 255)
@@ -134,10 +134,17 @@ def update_grid_image(matrix, data):
     cv2.imshow("Grid Image", grid_img)
     
 
-
+##!
+#  Display the initial grid with grid cells.
+#
+#  @brief This function takes a matrix and displays it as a grid with cells using OpenCV.
+#
+#  @param matrix: The input matrix representing the grid.
+#  @param data: Additional data required for displaying the grid.
+#
 def showInitialGrid(matrix, data):
     grid_color = (0, 0, 255)
-    grid_img = data.MData.origImg.copy()
+    grid_img = data.MData.orig_img.copy()
     cell_size = data.MData.cell_size
 
     # Convert matrix to NumPy array for faster computations
@@ -153,7 +160,7 @@ def showInitialGrid(matrix, data):
     data.gData.grid_image = grid_img
     
     # Update the grid image with the initial grid
-    update_grid_image(matrix, data)
+    updateGridImage(matrix, data)
 
 
 ##!
@@ -164,32 +171,32 @@ def showInitialGrid(matrix, data):
 # @param filename The path to the image file to be edited.
 # @return The edited image.
 #
-def edit_image(filename):
-    screenWidth = GetSystemMetrics(0)
-    screenHeight = GetSystemMetrics(1)
+def editImage(filename):
+    screen_Width = GetSystemMetrics(0)
+    screen_Height = GetSystemMetrics(1)
 
     img = cv2.imread(filename, cv2.IMREAD_COLOR)
     if img is None:
         print("Could not read the image")
 
-    imageAspectRatio = img.shape[1] / img.shape[0]
+    image_Aspect_Ratio = img.shape[1] / img.shape[0]
     
-    maxWidth = screenWidth
-    maxHeight = screenHeight
+    max_Width = screen_Width
+    max_Height = screen_Height
 
-    scaledWidth = maxWidth
-    scaledHeight = int(scaledWidth / imageAspectRatio)
+    scaled_Width = max_Width
+    scaled_Height = int(scaled_Width / image_Aspect_Ratio)
 
-    if scaledHeight > maxHeight:
-        scaledHeight = maxHeight
-        scaledWidth = int(scaledHeight * imageAspectRatio)
+    if scaled_Height > max_Height:
+        scaled_Height = max_Height
+        scaled_Width = int(scaled_Height * image_Aspect_Ratio)
 
-    posX = (screenWidth - scaledWidth) // 2
-    posY = (screenHeight - scaledHeight) // 2
+    pos_X = (screen_Width - scaled_Width) // 2
+    pos_Y = (screen_Height - scaled_Height) // 2
 
     cv2.namedWindow("Grid Image")
-    cv2.moveWindow("Grid Image", posX, posY)
-    img = cv2.resize(img, (scaledWidth, scaledHeight))
+    cv2.moveWindow("Grid Image", pos_X, pos_Y)
+    img = cv2.resize(img, (scaled_Width, scaled_Height))
 
     return img
 
@@ -202,7 +209,7 @@ def edit_image(filename):
 # @param img The input image.
 # @return A tuple containing the ROI image, start point, and end point.
 #
-def get_roi(img):
+def getRoi(img):
     hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # Define the lower and upper bounds of the black color range
@@ -213,31 +220,31 @@ def get_roi(img):
     mask = cv2.inRange(hsv_img, lower, upper)
     
     # Apply the mask to the original image
-    maskImg = cv2.bitwise_and(img, img, mask=mask)
+    mask_img = cv2.bitwise_and(img, img, mask=mask)
 
     # Find the coordinates of black pixels
     coords = np.where(mask == 255)
     
     # Find the highest, lowest, leftmost, and rightmost points
-    highestPoint = None
-    lowestPoint = None
-    leftmostPoint = None
-    rightmostPoint = None
+    highest_point = None
+    lowest_point = None
+    leftmost_point = None
+    rightmost_point = None
 
     for y, x in zip(coords[0], coords[1]):
-        if highestPoint is None or y < highestPoint[1]:
-            highestPoint = (x, y)
-        if lowestPoint is None or y > lowestPoint[1]:
-            lowestPoint = (x, y)
-        if leftmostPoint is None or x < leftmostPoint[0]:
-            leftmostPoint = (x, y)
-        if rightmostPoint is None or x > rightmostPoint[0]:
-            rightmostPoint = (x, y)
+        if highest_point is None or y < highest_point[1]:
+            highest_point = (x, y)
+        if lowest_point is None or y > lowest_point[1]:
+            lowest_point = (x, y)
+        if leftmost_point is None or x < leftmost_point[0]:
+            leftmost_point = (x, y)
+        if rightmost_point is None or x > rightmost_point[0]:
+            rightmost_point = (x, y)
 
-    startPoint = (leftmostPoint[0], highestPoint[1]) if leftmostPoint is not None else (0, 0)
-    endPoint = (rightmostPoint[0], lowestPoint[1]) if rightmostPoint is not None else (0, 0)
+    start_point = (leftmost_point[0], highest_point[1]) if leftmost_point is not None else (0, 0)
+    end_point = (rightmost_point[0], lowest_point[1]) if rightmost_point is not None else (0, 0)
     
-    return maskImg, startPoint, endPoint
+    return mask_img, start_point, end_point
 
 
 ##!
@@ -251,7 +258,7 @@ def get_roi(img):
 # @param flags Additional flags indicating the state of the mouse buttons.
 # @param user_data User-defined data passed to the callback function.
 #
-def OnMouse(event, x, y, flags, user_data):
+def onMouse(event, x, y, flags, user_data):
     data = user_data
     cell_size = data.MData.cell_size
     matrix = data.MData.matrix
@@ -271,7 +278,7 @@ def OnMouse(event, x, y, flags, user_data):
                         data.MData.counter += 1
                         current_cell = data.MData.counter
                         matrix[i][j] = current_cell  # Update the value in the matrix
-                        update_grid_image(matrix, data)
+                        updateGridImage(matrix, data)
                         data.MData.route.append((i, j))
                         print(f"{j}/{i}: {data.MData.counter}")
                         print("route:", ",".join(f"{coord[0]}/{coord[1]}" for coord in data.MData.route))
@@ -286,14 +293,14 @@ def OnMouse(event, x, y, flags, user_data):
                                 data.MData.meetPunten.pop(meetpunten_it)
                             current_cell = 0
                             matrix[i][j] = current_cell  # Update the value in the matrix
-                            update_grid_image(matrix, data)
+                            updateGridImage(matrix, data)
                             data.MData.delete.append((i, j))
             elif data.MData.mode == 1:
                 if flags & cv2.EVENT_FLAG_LBUTTON:
                     if current_cell == 0:
                         current_cell = 9999
                         matrix[i][j] = current_cell  # Update the value in the matrix
-                        update_grid_image(matrix, data)
+                        updateGridImage(matrix, data)
                         data.MData.robotX = i
                         data.MData.robotY = j
                 elif flags & cv2.EVENT_FLAG_RBUTTON:
@@ -301,18 +308,18 @@ def OnMouse(event, x, y, flags, user_data):
                         current_cell = data.MData.checkpoint_counter
                         matrix[i][j] = current_cell  # Update the value in the matrix
                         data.MData.meetPunten.append((i, j))
-                        update_grid_image(matrix, data)
+                        updateGridImage(matrix, data)
                         print("meetPunten:", ",".join(f"{coord[0]}/{coord[1]}" for coord in data.MData.meetPunten))
             elif data.MData.mode == 2:
                 if flags & cv2.EVENT_FLAG_LBUTTON:
                     if current_cell == 0:
                         current_cell = 6000
                         matrix[i][j] = current_cell  # Update the value in the matrix
-                        update_grid_image(matrix, data)
+                        updateGridImage(matrix, data)
                         data.MData.hoeken.append((i, j))
                         print("hoeken:", ",".join(f"{coord[0]}/{coord[1]}" for coord in data.MData.hoeken))
                 elif flags & cv2.EVENT_FLAG_RBUTTON:
-                    update_grid_image(matrix, data)
+                    updateGridImage(matrix, data)
         elif event == cv2.EVENT_MOUSEWHEEL:
             data.MData.mode = (data.MData.mode + 1) % 3  # Cycle through modes 0, 1, and 2
             print(f"mode: {data.MData.mode}")
@@ -325,10 +332,10 @@ def OnMouse(event, x, y, flags, user_data):
 # @param img The input image.
 # @param begin The starting coordinates of the region of interest (ROI).
 # @param end The ending coordinates of the region of interest (ROI).
-# @param origImg The original image.
+# @param orig_img The original image.
 # @return A tuple containing the matrix and an instance of the StoreData class.
 #
-def setData(img, begin, end, origImg):
+def setData(img, begin, end, orig_img):
     longest_dim = max(img.shape[1], img.shape[0])
     cell_size = int(np.ceil(longest_dim / 300))
 
@@ -347,7 +354,7 @@ def setData(img, begin, end, origImg):
     uData.MData.matrix = matrix
     uData.MData.cell_size = cell_size
     uData.MData.img = img
-    uData.MData.origImg = origImg
+    uData.MData.orig_img = orig_img
     
     return matrix, uData
 
@@ -359,7 +366,7 @@ def setData(img, begin, end, origImg):
 # @param uData The input data object containing route, meetPunten, and hoeken attributes.
 # @param filename The name of the text file to write the data to.
 #
-def write_to_txt(uData, filename):
+def writeToTxt(uData, filename):
     # Convert tuples to strings
     route_str = [f"{coord[0]}/{coord[1]}" for coord in uData.MData.route]
     meetPunten_str = [f"{coord[0]}/{coord[1]}" for coord in uData.MData.meetPunten]
@@ -379,7 +386,7 @@ def write_to_txt(uData, filename):
 # @param filename The name of the text file to read.
 # @return Three arrays containing the data from the text file.
 #
-def read_txt(filename):
+def readTxt(filename):
     # Read the contents of the text file
     with open(filename, "r") as file:
         data = file.read()
@@ -409,53 +416,53 @@ def read_txt(filename):
 # @param filename The path to the input image file.
 # @return The grid image matrix.
 #
-def create_grid_image(filename):
+def createGridImage(filename):
     
-    screenWidth = GetSystemMetrics(0)
-    screenHeight = GetSystemMetrics(1)
+    screen_Width = GetSystemMetrics(0)
+    screen_Height = GetSystemMetrics(1)
 
-    origImg = cv2.imread(filename, cv2.IMREAD_COLOR)
-    if origImg is None:
+    orig_img = cv2.imread(filename, cv2.IMREAD_COLOR)
+    if orig_img is None:
         print("Could not read the image")
 
-    imageAspectRatio = origImg.shape[1] / origImg.shape[0]
+    image_Aspect_Ratio = orig_img.shape[1] / orig_img.shape[0]
     
-    maxWidth = screenWidth
-    maxHeight = screenHeight
+    max_Width = screen_Width
+    max_Height = screen_Height
  
-    scaledWidth = maxWidth
-    scaledHeight = int(scaledWidth / imageAspectRatio)
+    scaled_Width = max_Width
+    scaled_Height = int(scaled_Width / image_Aspect_Ratio)
 
-    if scaledHeight > maxHeight:
-        scaledHeight = maxHeight
-        scaledWidth = int(scaledHeight * imageAspectRatio)
+    if scaled_Height > max_Height:
+        scaled_Height = max_Height
+        scaled_Width = int(scaled_Height * image_Aspect_Ratio)
 
-    posX = (screenWidth - scaledWidth) // 2
-    posY = (screenHeight - scaledHeight) // 2
+    pos_X = (screen_Width - scaled_Width) // 2
+    pos_Y = (screen_Height - scaled_Height) // 2
 
     cv2.namedWindow("Grid Image")
-    cv2.moveWindow("Grid Image", posX, posY)
-    origImg = cv2.resize(origImg, (scaledWidth, scaledHeight))
+    cv2.moveWindow("Grid Image", pos_X, pos_Y)
+    orig_img = cv2.resize(orig_img, (scaled_Width, scaled_Height))
     
-    img, begin, end = get_roi(origImg)
+    img, begin, end = getRoi(orig_img)
     
 
-    matrix, uData = setData(img, begin, end, origImg)
+    matrix, uData = setData(img, begin, end, orig_img)
     
-    cv2.setMouseCallback("Grid Image", OnMouse, uData)
+    cv2.setMouseCallback("Grid Image", onMouse, uData)
     showInitialGrid(matrix, uData)
 
     cv2.waitKey(0)
     
-    write_to_txt(uData, "arrays.txt")
+    writeToTxt(uData, "arrays.txt")
     
-    arr1, arr2, arr3 = read_txt("arrays.txt")
+    arr1, arr2, arr3 = readTxt("arrays.txt")
     print(arr1, "\n")
     print(arr2, "\n")
     print(arr3, "\n")
 
     
-    arr1, arr2, arr3 = read_txt("arrays.txt")
+    arr1, arr2, arr3 = readTxt("arrays.txt")
     print(arr1, "\n")
     print(arr2, "\n")
     print(arr3, "\n")
@@ -465,7 +472,7 @@ def create_grid_image(filename):
 
 def main():
     
-    matrix = create_grid_image("Finallayout.png")
+    matrix = createGridImage("Finallayout.png")
 
 
 if __name__ == '__main__':
